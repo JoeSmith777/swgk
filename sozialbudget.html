@@ -126,14 +126,8 @@ main {
 
 /* ─── Slide-Down-Animation ───────────────────────────── */
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-18px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .placed-card.inserting {
   animation: slideDown 0.22s ease-out;
@@ -208,16 +202,16 @@ main {
   transform: translate(-50%, -50%);
   display: none;
 }
-#drag-ghost[data-id="rente"]               { background: linear-gradient(145deg, #d0e8f8, #b8d8f0); border: 2px solid #5a9abf; }
-#drag-ghost[data-id="krankenversicherung"] { background: linear-gradient(145deg, #c8ecd4, #b0e0c0); border: 2px solid #4aaa6a; }
-#drag-ghost[data-id="pensionen"]           { background: linear-gradient(145deg, #fae8c0, #f4d898); border: 2px solid #c89830; }
-#drag-ghost[data-id="pflegeversicherung"]  { background: linear-gradient(145deg, #e4d4f4, #d4c0ec); border: 2px solid #9060c0; }
-#drag-ghost[data-id="kindergeld"]          { background: linear-gradient(145deg, #fad4c8, #f4c0b0); border: 2px solid #c86050; }
-#drag-ghost[data-id="buergergeld"]         { background: linear-gradient(145deg, #c0eaec, #a8dce0); border: 2px solid #3a9ea8; }
-#drag-ghost[data-id="sozialhilfe"]         { background: linear-gradient(145deg, #dcecc0, #cce0a8); border: 2px solid #7aa030; }
-#drag-ghost[data-id="alg1"]               { background: linear-gradient(145deg, #fce0c0, #f8cfa0); border: 2px solid #d08030; }
-#drag-ghost[data-id="wohngeld"]            { background: linear-gradient(145deg, #d8d0f0, #c8bce8); border: 2px solid #7060b8; }
-#drag-ghost[data-id="ausbildungsfoerderung"] { background: linear-gradient(145deg, #d4f0cc, #c0e8b4); border: 2px solid #58a040; }
+#drag-ghost[data-id="rente"]                  { background: linear-gradient(145deg, #d0e8f8, #b8d8f0); border: 2px solid #5a9abf; }
+#drag-ghost[data-id="krankenversicherung"]    { background: linear-gradient(145deg, #c8ecd4, #b0e0c0); border: 2px solid #4aaa6a; }
+#drag-ghost[data-id="pensionen"]              { background: linear-gradient(145deg, #fae8c0, #f4d898); border: 2px solid #c89830; }
+#drag-ghost[data-id="pflegeversicherung"]     { background: linear-gradient(145deg, #e4d4f4, #d4c0ec); border: 2px solid #9060c0; }
+#drag-ghost[data-id="kindergeld"]             { background: linear-gradient(145deg, #fad4c8, #f4c0b0); border: 2px solid #c86050; }
+#drag-ghost[data-id="buergergeld"]            { background: linear-gradient(145deg, #c0eaec, #a8dce0); border: 2px solid #3a9ea8; }
+#drag-ghost[data-id="sozialhilfe"]            { background: linear-gradient(145deg, #dcecc0, #cce0a8); border: 2px solid #7aa030; }
+#drag-ghost[data-id="alg1"]                   { background: linear-gradient(145deg, #fce0c0, #f8cfa0); border: 2px solid #d08030; }
+#drag-ghost[data-id="wohngeld"]               { background: linear-gradient(145deg, #d8d0f0, #c8bce8); border: 2px solid #7060b8; }
+#drag-ghost[data-id="ausbildungsfoerderung"]  { background: linear-gradient(145deg, #d4f0cc, #c0e8b4); border: 2px solid #58a040; }
 
 .card-title {
   font-size: .95rem;
@@ -350,12 +344,12 @@ tr:nth-child(even) {
 }
 @media (max-width: 600px) {
   .card,
-  .placed-card  { min-height: 70px; padding: 7px 9px; }
-  .card-title   { font-size: .85rem; }
+  .placed-card { min-height: 70px; padding: 7px 9px; }
+  .card-title { font-size: .85rem; }
   .card-explanation { font-size: .74rem; }
-  .amount       { font-size: .92rem; }
-  .slot         { min-height: 70px; padding: 7px; }
-  .column       { padding: 12px; }
+  .amount { font-size: .92rem; }
+  .slot { min-height: 70px; padding: 7px; }
+  .column { padding: 12px; }
 }
 </style>
 </head>
@@ -364,7 +358,8 @@ tr:nth-child(even) {
 <header>
   <h1>SW GK Q2 – Thema 6: Sozialpolitik</h1>
   <p>6.1: Bausteine der sozialen Sicherung</p>
-  <p>Quelle: Statistisches Bundesamt 2025</p></header>
+  <p>Quelle: Statistisches Bundesamt 2025</p>
+</header>
 
 <main>
   <div class="instruction">
@@ -415,16 +410,16 @@ tr:nth-child(even) {
 <script>
 /* ─── Daten ──────────────────────────────────────────── */
 const data = [
-  { id: "rente",                 name: "Rentenversicherung",                              value: 430.0, explanation: "Sichert Einkommen im Alter." },
-  { id: "krankenversicherung",   name: "Krankenversicherung, gesetzlich",                 value: 335.0, explanation: "Finanziert medizinische Versorgung." },
-  { id: "pensionen",             name: "Pensionen, Beihilfen, Familienzuschläge",         value: 105.0, explanation: "Versorgt Beamt:innen und ihre Familien." },
-  { id: "pflegeversicherung",    name: "Pflegeversicherung",                              value:  76.0, explanation: "Unterstützt bei Pflegebedürftigkeit." },
-  { id: "kindergeld",            name: "Kindergeld, Elterngeld",                          value:  69.5, explanation: "Unterstützt Familien mit Kindern." },
-  { id: "buergergeld",           name: "Grundsicherung für Arbeitsuchende (Bürgergeld)",  value:  60.1, explanation: "Sichert den Lebensunterhalt Arbeitssuchender." },
-  { id: "sozialhilfe",           name: "Sozialhilfe",                                     value:  56.5, explanation: "Hilft Menschen ohne ausreichendes Einkommen." },
-  { id: "alg1",                  name: "Arbeitslosenversicherung (ALG I)",                value:  39.0, explanation: "Unterstützt nach Arbeitsplatzverlust." },
-  { id: "wohngeld",              name: "Wohngeld",                                        value:   5.5, explanation: "Unterstützt Haushalte bei Wohnkosten." },
-  { id: "ausbildungsfoerderung", name: "Ausbildungsförderung",                            value:   3.6, explanation: "Unterstützt während der Ausbildung." }
+  { id: "rente",                  name: "Rentenversicherung",                              value: 430.0, explanation: "Sichert Einkommen im Alter." },
+  { id: "krankenversicherung",    name: "Krankenversicherung, gesetzlich",                 value: 335.0, explanation: "Finanziert medizinische Versorgung." },
+  { id: "pensionen",              name: "Pensionen, Beihilfen, Familienzuschläge",         value: 105.0, explanation: "Versorgt Beamt:innen und ihre Familien." },
+  { id: "pflegeversicherung",     name: "Pflegeversicherung",                              value:  76.0, explanation: "Unterstützt bei Pflegebedürftigkeit." },
+  { id: "kindergeld",             name: "Kindergeld, Elterngeld",                          value:  69.5, explanation: "Unterstützt Familien mit Kindern." },
+  { id: "buergergeld",            name: "Grundsicherung für Arbeitsuchende (Bürgergeld)",  value:  60.1, explanation: "Sichert den Lebensunterhalt Arbeitssuchender." },
+  { id: "sozialhilfe",            name: "Sozialhilfe",                                     value:  56.5, explanation: "Hilft Menschen ohne ausreichendes Einkommen." },
+  { id: "alg1",                   name: "Arbeitslosenversicherung (ALG I)",                value:  39.0, explanation: "Unterstützt nach Arbeitsplatzverlust." },
+  { id: "wohngeld",               name: "Wohngeld",                                        value:   5.5, explanation: "Unterstützt Haushalte bei Wohnkosten." },
+  { id: "ausbildungsfoerderung",  name: "Ausbildungsförderung",                            value:   3.6, explanation: "Unterstützt während der Ausbildung." }
 ];
 
 /* ─── Hilfsfunktionen ────────────────────────────────── */
@@ -448,7 +443,6 @@ let shuffledData      = shuffleArray(data);
 let placedOrder       = [];
 let gameChecked       = false;
 let lastInsertedIndex = -1;
-
 let draggedId         = null;
 let draggedFromIndex  = null;
 
@@ -466,6 +460,61 @@ const resolutionContent        = document.getElementById("resolutionContent");
 const restartButton            = document.getElementById("restartButton");
 const backFromResolutionButton = document.getElementById("backFromResolutionButton");
 
+/* ═══════════════════════════════════════════════════════
+   AUTO-SCROLL
+   – Wird sowohl vom Touch- als auch vom Maus-Drag genutzt.
+   – Scrollzone: obere / untere 80 px des Viewports.
+   – Geschwindigkeit: linear skaliert 1–12 px pro Frame.
+   ═══════════════════════════════════════════════════════ */
+const SCROLL_ZONE  = 80;   // px ab Rand
+const SCROLL_MAX   = 12;   // px pro requestAnimationFrame
+let   scrollRafId  = null;
+let   scrollSpeed  = 0;    // negativ = hoch, positiv = runter
+
+function autoScroll(clientY) {
+  const vh = window.innerHeight;
+  if (clientY < SCROLL_ZONE) {
+    // Nähe zum oberen Rand → nach oben scrollen
+    scrollSpeed = -Math.round(SCROLL_MAX * (1 - clientY / SCROLL_ZONE));
+  } else if (clientY > vh - SCROLL_ZONE) {
+    // Nähe zum unteren Rand → nach unten scrollen
+    scrollSpeed = Math.round(SCROLL_MAX * (1 - (vh - clientY) / SCROLL_ZONE));
+  } else {
+    scrollSpeed = 0;
+  }
+
+  if (scrollSpeed !== 0 && scrollRafId === null) {
+    scrollRafId = requestAnimationFrame(doScroll);
+  }
+}
+
+function doScroll() {
+  if (scrollSpeed === 0) {
+    scrollRafId = null;
+    return;
+  }
+  window.scrollBy(0, scrollSpeed);
+  scrollRafId = requestAnimationFrame(doScroll);
+}
+
+function stopAutoScroll() {
+  scrollSpeed = 0;
+  if (scrollRafId !== null) {
+    cancelAnimationFrame(scrollRafId);
+    scrollRafId = null;
+  }
+}
+
+/* ─── Maus-Drag: Auto-Scroll über document-dragover ─── */
+document.addEventListener("dragover", e => {
+  if (draggedId !== null) {
+    autoScroll(e.clientY);
+  }
+});
+document.addEventListener("dragend", () => {
+  stopAutoScroll();
+});
+
 /* ─── Render ─────────────────────────────────────────── */
 function render() {
   slotsContainer.innerHTML = "";
@@ -473,49 +522,39 @@ function render() {
 
   data.forEach((amountItem, index) => {
     const slot = document.createElement("div");
-    slot.className = "slot";
+    slot.className    = "slot";
     slot.dataset.index = index;
 
     const amount = document.createElement("div");
-    amount.className = "amount";
+    amount.className   = "amount";
     amount.textContent = `${formatNumber(amountItem.value)} Mrd. €`;
     slot.appendChild(amount);
 
     const placedId = placedOrder[index];
     if (placedId) {
       const item = getItem(placedId);
-      const pc = document.createElement("div");
-      pc.className = "placed-card";
-      pc.dataset.id = item.id;
+      const pc   = document.createElement("div");
+      pc.className        = "placed-card";
+      pc.dataset.id       = item.id;
       pc.dataset.slotIndex = index;
       pc.innerHTML = `
         <div class="card-title">${item.name}</div>
         <div class="card-explanation">${item.explanation}</div>
       `;
-      if (lastInsertedIndex === index) {
-        pc.classList.add("inserting");
-      }
+      if (lastInsertedIndex === index) pc.classList.add("inserting");
       addDragListeners(pc, item.id, index);
       addTouchListeners(pc, item.id, index);
       slot.appendChild(pc);
     } else {
       const hint = document.createElement("div");
-      hint.className = "empty-hint";
+      hint.className   = "empty-hint";
       hint.textContent = "Kachel hierher ziehen …";
       slot.appendChild(hint);
     }
 
-    slot.addEventListener("dragover", e => {
-      e.preventDefault();
-      slot.classList.add("over");
-    });
-    slot.addEventListener("dragleave", () => slot.classList.remove("over"));
-    slot.addEventListener("drop", e => {
-      e.preventDefault();
-      slot.classList.remove("over");
-      handleDrop(index);
-    });
-
+    slot.addEventListener("dragover",  e => { e.preventDefault(); slot.classList.add("over"); });
+    slot.addEventListener("dragleave", ()  => slot.classList.remove("over"));
+    slot.addEventListener("drop",      e  => { e.preventDefault(); slot.classList.remove("over"); handleDrop(index); });
     slotsContainer.appendChild(slot);
   });
 
@@ -523,10 +562,10 @@ function render() {
   const unplaced = shuffledData.filter(item => !placedOrder.includes(item.id));
   unplaced.forEach(item => {
     const card = document.createElement("div");
-    card.className = "card";
-    card.draggable = true;
+    card.className  = "card";
+    card.draggable  = true;
     card.dataset.id = item.id;
-    card.innerHTML = `
+    card.innerHTML  = `
       <div class="card-title">${item.name}</div>
       <div class="card-explanation">${item.explanation}</div>
     `;
@@ -536,20 +575,21 @@ function render() {
   });
 
   checkButton.disabled = placedOrder.filter(Boolean).length < data.length;
-  lastInsertedIndex = -1;
+  lastInsertedIndex    = -1;
 }
 
 /* ─── Maus-Drag-Listeners ────────────────────────────── */
 function addDragListeners(el, id, fromIndex) {
   el.draggable = true;
   el.addEventListener("dragstart", e => {
-    draggedId        = id;
-    draggedFromIndex = fromIndex;
+    draggedId         = id;
+    draggedFromIndex  = fromIndex;
     setTimeout(() => el.classList.add("dragging"), 0);
     e.dataTransfer.effectAllowed = "move";
   });
   el.addEventListener("dragend", () => {
     el.classList.remove("dragging");
+    stopAutoScroll();
   });
 }
 
@@ -558,9 +598,9 @@ function addTouchListeners(el, id, fromIndex) {
   el.addEventListener("touchstart", e => {
     draggedId        = id;
     draggedFromIndex = fromIndex;
-    const item = getItem(id);
+    const item       = getItem(id);
     ghost.dataset.id = id;
-    ghost.innerHTML = `
+    ghost.innerHTML  = `
       <div class="card-title">${item.name}</div>
       <div class="card-explanation">${item.explanation}</div>
     `;
@@ -572,18 +612,21 @@ function addTouchListeners(el, id, fromIndex) {
   el.addEventListener("touchmove", e => {
     e.preventDefault();
     moveTouchGhost(e.touches[0]);
+    autoScroll(e.touches[0].clientY);   // ← Auto-Scroll aktiv
   }, { passive: false });
 
   el.addEventListener("touchend", e => {
     ghost.style.display = "none";
     ghost.removeAttribute("data-id");
     el.classList.remove("dragging");
+    stopAutoScroll();                    // ← Scroll stoppen
+
     const touch  = e.changedTouches[0];
     const target = document.elementFromPoint(touch.clientX, touch.clientY);
     const slot   = target ? target.closest(".slot") : null;
+
     if (slot) {
-      const slotIndex = parseInt(slot.dataset.index, 10);
-      handleDrop(slotIndex);
+      handleDrop(parseInt(slot.dataset.index, 10));
     } else if (target && target.closest("#cards")) {
       if (draggedFromIndex >= 0) {
         placedOrder[draggedFromIndex] = null;
@@ -605,10 +648,10 @@ function handleDrop(targetIndex) {
   if (draggedId === null) return;
 
   if (draggedFromIndex >= 0) {
-    const existingId = placedOrder[targetIndex] || null;
+    const existingId              = placedOrder[targetIndex] || null;
     placedOrder[draggedFromIndex] = existingId;
     placedOrder[targetIndex]      = draggedId;
-    lastInsertedIndex = targetIndex;
+    lastInsertedIndex             = targetIndex;
     draggedId        = null;
     draggedFromIndex = null;
     render();
@@ -620,12 +663,11 @@ function handleDrop(targetIndex) {
     if (!placedOrder[i]) { freeIndex = i; break; }
   }
   if (freeIndex === -1) freeIndex = data.length - 1;
-
   for (let i = freeIndex; i > targetIndex; i--) {
     placedOrder[i] = placedOrder[i - 1];
   }
   placedOrder[targetIndex] = draggedId;
-  lastInsertedIndex = targetIndex;
+  lastInsertedIndex        = targetIndex;
   draggedId        = null;
   draggedFromIndex = null;
   render();
@@ -655,7 +697,7 @@ checkButton.addEventListener("click", () => {
     } else if (placed.value > correct.value) {
       html += `
         <div class="evaluation-item overestimated">
-          🔼 Platz ${rank}: Du hast <strong>${placed.name}</strong> eingeordnet
+          🟧 Platz ${rank}: Du hast <strong>${placed.name}</strong> eingeordnet
           (${formatNumber(placed.value)} Mrd. €), aber richtig wäre
           <strong>${correct.name}</strong>
           (${formatNumber(correct.value)} Mrd. €) – überschätzt.
@@ -663,7 +705,7 @@ checkButton.addEventListener("click", () => {
     } else {
       html += `
         <div class="evaluation-item underestimated">
-          🔽 Platz ${rank}: Du hast <strong>${placed.name}</strong> eingeordnet
+          🟦 Platz ${rank}: Du hast <strong>${placed.name}</strong> eingeordnet
           (${formatNumber(placed.value)} Mrd. €), aber richtig wäre
           <strong>${correct.name}</strong>
           (${formatNumber(correct.value)} Mrd. €) – unterschätzt.
@@ -713,10 +755,12 @@ showResolutionButton.addEventListener("click", () => {
 backFromEvaluationButton.addEventListener("click", () => {
   evaluationOverlay.classList.remove("show");
 });
+
 backFromResolutionButton.addEventListener("click", () => {
   resolutionOverlay.classList.remove("show");
   evaluationOverlay.classList.add("show");
 });
+
 restartButton.addEventListener("click", () => {
   placedOrder       = [];
   shuffledData      = shuffleArray(data);
@@ -733,3 +777,4 @@ render();
 </script>
 </body>
 </html>
+
