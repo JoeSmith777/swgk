@@ -1,800 +1,735 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bausteine der sozialen Sicherung</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bausteine der sozialen Sicherung</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f0f4f8;
+  color: #1a2e3b;
+}
+header {
+  padding: 24px 16px;
+  text-align: center;
+  background: linear-gradient(135deg, #1a4a6e 0%, #2e7db5 100%);
+  color: white;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  font-family: "Times New Roman", Times, serif;
+}
+header p {
+  margin: 8px 0 0;
+  opacity: 0.88;
+  font-size: 1rem;
+}
+main {
+  width: min(1100px, 94vw);
+  margin: 24px auto;
+}
+.instruction {
+  margin-bottom: 22px;
+  padding: 16px 20px;
+  background: white;
+  border-left: 5px solid #2e7db5;
+  border-radius: 12px;
+  text-align: center;
+  line-height: 1.6;
+  box-shadow: 0 3px 10px rgba(0,0,0,.08);
+}
+.game {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.column {
+  padding: 18px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.10);
+}
+.column h2 {
+  margin: 0 0 16px;
+  text-align: center;
+  font-size: 1.15rem;
+  color: #1a4a6e;
+  border-bottom: 2px solid #dce8f2;
+  padding-bottom: 10px;
+}
+.slots,
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.slot {
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border: 2px dashed #a0bcd0;
+  border-radius: 10px;
+  background: #f4f8fb;
+  transition: background .2s, border-color .2s;
+}
+.slot.over {
+  background: #fff8dc;
+  border-color: #d4a800;
+  border-style: solid;
+}
+.amount {
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: #1a4a6e;
+}
+.card,
+.placed-card {
+  border-radius: 8px;
+  padding: 10px 12px;
+  user-select: none;
+  touch-action: none;
+}
+.card {
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: grab;
+  box-shadow: 0 3px 8px rgba(0,0,0,.09);
+  transition: box-shadow .15s, transform .1s, filter .15s;
+}
+.placed-card {
+  cursor: grab;
+  transition: filter .15s;
+}
+.card:hover,
+.placed-card:hover {
+  filter: brightness(0.93);
+  box-shadow: 0 5px 14px rgba(0,0,0,.13);
+}
+.card.dragging,
+.placed-card.dragging {
+  opacity: .4;
+  transform: scale(.97);
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+/* ─── Slide-Down-Animation ───────────────────────────── */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.placed-card.inserting {
+  animation: slideDown 0.22s ease-out;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #eef3f7;
-      color: #183247;
-    }
+/* ─── Individuelle Kachelfarben per data-id ──────────── */
+.card[data-id="rente"],
+.placed-card[data-id="rente"] {
+  background: linear-gradient(145deg, #d0e8f8, #b8d8f0);
+  border: 2px solid #5a9abf;
+}
+.card[data-id="krankenversicherung"],
+.placed-card[data-id="krankenversicherung"] {
+  background: linear-gradient(145deg, #c8ecd4, #b0e0c0);
+  border: 2px solid #4aaa6a;
+}
+.card[data-id="pensionen"],
+.placed-card[data-id="pensionen"] {
+  background: linear-gradient(145deg, #fae8c0, #f4d898);
+  border: 2px solid #c89830;
+}
+.card[data-id="pflegeversicherung"],
+.placed-card[data-id="pflegeversicherung"] {
+  background: linear-gradient(145deg, #e4d4f4, #d4c0ec);
+  border: 2px solid #9060c0;
+}
+.card[data-id="kindergeld"],
+.placed-card[data-id="kindergeld"] {
+  background: linear-gradient(145deg, #fad4c8, #f4c0b0);
+  border: 2px solid #c86050;
+}
+.card[data-id="buergergeld"],
+.placed-card[data-id="buergergeld"] {
+  background: linear-gradient(145deg, #c0eaec, #a8dce0);
+  border: 2px solid #3a9ea8;
+}
+.card[data-id="sozialhilfe"],
+.placed-card[data-id="sozialhilfe"] {
+  background: linear-gradient(145deg, #dcecc0, #cce0a8);
+  border: 2px solid #7aa030;
+}
+.card[data-id="alg1"],
+.placed-card[data-id="alg1"] {
+  background: linear-gradient(145deg, #fce0c0, #f8cfa0);
+  border: 2px solid #d08030;
+}
+.card[data-id="wohngeld"],
+.placed-card[data-id="wohngeld"] {
+  background: linear-gradient(145deg, #d8d0f0, #c8bce8);
+  border: 2px solid #7060b8;
+}
+.card[data-id="ausbildungsfoerderung"],
+.placed-card[data-id="ausbildungsfoerderung"] {
+  background: linear-gradient(145deg, #d4f0cc, #c0e8b4);
+  border: 2px solid #58a040;
+}
 
-    header {
-      padding: 24px 16px;
-      text-align: center;
-      background: #183247;
-      color: white;
-    }
+/* ─── Touch-Ghost ────────────────────────────────────── */
+#drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: .85;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  min-width: 180px;
+  max-width: 260px;
+  font-family: Arial, sans-serif;
+  font-size: .9rem;
+  color: #1a2e3b;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+#drag-ghost[data-id="rente"]               { background: linear-gradient(145deg, #d0e8f8, #b8d8f0); border: 2px solid #5a9abf; }
+#drag-ghost[data-id="krankenversicherung"] { background: linear-gradient(145deg, #c8ecd4, #b0e0c0); border: 2px solid #4aaa6a; }
+#drag-ghost[data-id="pensionen"]           { background: linear-gradient(145deg, #fae8c0, #f4d898); border: 2px solid #c89830; }
+#drag-ghost[data-id="pflegeversicherung"]  { background: linear-gradient(145deg, #e4d4f4, #d4c0ec); border: 2px solid #9060c0; }
+#drag-ghost[data-id="kindergeld"]          { background: linear-gradient(145deg, #fad4c8, #f4c0b0); border: 2px solid #c86050; }
+#drag-ghost[data-id="buergergeld"]         { background: linear-gradient(145deg, #c0eaec, #a8dce0); border: 2px solid #3a9ea8; }
+#drag-ghost[data-id="sozialhilfe"]         { background: linear-gradient(145deg, #dcecc0, #cce0a8); border: 2px solid #7aa030; }
+#drag-ghost[data-id="alg1"]               { background: linear-gradient(145deg, #fce0c0, #f8cfa0); border: 2px solid #d08030; }
+#drag-ghost[data-id="wohngeld"]            { background: linear-gradient(145deg, #d8d0f0, #c8bce8); border: 2px solid #7060b8; }
+#drag-ghost[data-id="ausbildungsfoerderung"] { background: linear-gradient(145deg, #d4f0cc, #c0e8b4); border: 2px solid #58a040; }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(1.4rem, 4vw, 2.2rem);
-      font-family: "Times New Roman", Times, serif;
-    }
+.card-title {
+  font-size: .95rem;
+  font-weight: bold;
+  color: #1a4a6e;
+}
+.card-explanation {
+  margin-top: 5px;
+  color: #4a6478;
+  font-size: .82rem;
+}
+.empty-hint {
+  color: #90a8b8;
+  font-size: .85rem;
+  text-align: center;
+  font-style: italic;
+}
+.buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+button {
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1a4a6e, #2e7db5);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,.18);
+  transition: background .2s, box-shadow .2s;
+}
+button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #22608f, #3a8ec8);
+  box-shadow: 0 5px 14px rgba(0,0,0,.22);
+}
+button:disabled {
+  background: #b0c4d2;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 40, 60, .80);
+}
+.overlay.show {
+  display: flex;
+}
+.overlay-box {
+  width: min(780px, 95vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 35px rgba(0,0,0,.30);
+}
+.overlay-box h2 {
+  margin-top: 0;
+  text-align: center;
+  color: #1a4a6e;
+}
+.overlay-buttons-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+.overlay-button {
+  display: inline-block;
+  width: fit-content;
+  margin: 0;
+}
+.evaluation-item {
+  margin: 8px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #f4f8fb;
+}
+.correct-line {
+  background: #e4f5e8;
+  color: #1e6b30;
+  border-left: 4px solid #3caa5c;
+}
+.overestimated {
+  background: #fff4e0;
+  color: #7a5200;
+  border-left: 4px solid #f0a500;
+}
+.underestimated {
+  background: #e5eef8;
+  color: #234f7a;
+  border-left: 4px solid #4a8cc4;
+}
+.center {
+  text-align: center;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .95rem;
+}
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #d0dce6;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: #1a4a6e;
+  color: white;
+}
+tr:nth-child(even) {
+  background: #f4f8fb;
+}
 
-    main {
-      width: min(1100px, 94vw);
-      margin: 24px auto;
-    }
-
-    .instruction {
-      margin-bottom: 22px;
-      padding: 16px;
-      background: white;
-      border-radius: 12px;
-      text-align: center;
-      line-height: 1.5;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
-    }
-
-    .game {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      align-items: start;
-    }
-
-    .column {
-      padding: 18px;
-      background: white;
-      border-radius: 14px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
-    }
-
-    .column h2 {
-      margin: 0 0 16px;
-      text-align: center;
-      font-size: 1.2rem;
-    }
-
-    .slots,
-    .cards {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .slot {
-      min-height: 92px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 6px;
-      padding: 10px;
-      border: 2px solid #8ca4b2;
-      border-radius: 10px;
-      background: #f5f8fa;
-      transition: background .2s, border-color .2s;
-    }
-
-    .slot.over {
-      background: #fff3bd;
-      border-color: #d6a900;
-    }
-
-    .amount {
-      text-align: center;
-      font-size: 1.05rem;
-      font-weight: bold;
-    }
-
-    .card,
-    .placed-card {
-      border-radius: 8px;
-      padding: 10px;
-      user-select: none;
-      touch-action: none;
-    }
-
-    .card {
-      min-height: 92px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      border: 2px solid #69a8ca;
-      background: #dceef8;
-      cursor: grab;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, .08);
-    }
-
-    .placed-card {
-      border: 2px solid #69a8ca;
-      background: #dceef8;
-      cursor: grab;
-    }
-
-    .card:hover,
-    .placed-card:hover {
-      background: #cbe5f3;
-    }
-
-    .card.dragging,
-    .placed-card.dragging {
-      opacity: .45;
-    }
-
-    .card-title {
-      font-size: .95rem;
-      font-weight: bold;
-    }
-
-    .card-explanation {
-      margin-top: 5px;
-      color: #526873;
-      font-size: .82rem;
-    }
-
-    .empty-hint {
-      color: #8a989f;
-      font-size: .85rem;
-      text-align: center;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    button {
-      padding: 11px 20px;
-      border: 0;
-      border-radius: 8px;
-      background: #183247;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    button:hover:not(:disabled) {
-      background: #28516d;
-    }
-
-    button:disabled {
-      background: #9aaab5;
-      cursor: not-allowed;
-    }
-
-    .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(24, 50, 71, .82);
-    }
-
-    .overlay.show {
-      display: flex;
-    }
-
-    .overlay-box {
-      width: min(780px, 95vw);
-      max-height: 88vh;
-      overflow-y: auto;
-      padding: 24px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 35px rgba(0, 0, 0, .3);
-    }
-
-    .overlay-box h2 {
-      margin-top: 0;
-      text-align: center;
-    }
-
-    .overlay-button {
-      display: block;
-      width: fit-content;
-      margin: 20px auto 0;
-    }
-
-    .evaluation-item {
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 8px;
-      background: #f5f8fa;
-    }
-
-    .correct-line {
-      background: #e4f3e6;
-      color: #236b30;
-    }
-
-    .overestimated {
-      background: #fff0d4;
-      color: #805b08;
-    }
-
-    .underestimated {
-      background: #e5eef8;
-      color: #285476;
-    }
-
-    .center {
-      text-align: center;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .95rem;
-    }
-
-    th,
-    td {
-      padding: 10px;
-      border-bottom: 1px solid #d8e0e5;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      background: #183247;
-      color: white;
-    }
-
-    tr:nth-child(even) {
-      background: #f5f8fa;
-    }
-
-    @media (max-width: 750px) {
-      .game {
-        grid-template-columns: 1fr;
-      }
-
-      table {
-        font-size: .8rem;
-      }
-
-      th,
-      td {
-        padding: 7px;
-      }
-    }
-  </style>
+/* ─── Responsive ─────────────────────────────────────── */
+@media (max-width: 750px) {
+  .game { grid-template-columns: 1fr; }
+  table { font-size: .8rem; }
+  th, td { padding: 7px; }
+}
+@media (max-width: 600px) {
+  .card,
+  .placed-card  { min-height: 70px; padding: 7px 9px; }
+  .card-title   { font-size: .85rem; }
+  .card-explanation { font-size: .74rem; }
+  .amount       { font-size: .92rem; }
+  .slot         { min-height: 70px; padding: 7px; }
+  .column       { padding: 12px; }
+}
+</style>
 </head>
-
 <body>
-  <header>
-    <h1>SW GK Q2 – Thema 6: Sozialpolitik</h1>
-    <p>6.1: Bausteine der sozialen Sicherung</p>
-  </header>
 
-  <main>
-    <div class="instruction">
-      Rechts sind zehn unterschiedliche Leistungen des Sozialstaates aufgelistet.
-      Betrachtet sie und zieht sie auf die einzelnen Beträge lins. Schätzt ein:
-      Welche Leistung hat die höchsten Ausgaben, welche die zweithöchsten usw.,
-      sodass ihr eine Reihenfolge erstellt. Prüft dann eure Schätzung.
+<header>
+  <h1>SW GK Q2 – Thema 6: Sozialpolitik</h1>
+  <p>6.1: Bausteine der sozialen Sicherung</p>
+  <p>Quelle: Statistisches Bundesamt 2025</p></header>
+
+<main>
+  <div class="instruction">
+    Rechts sind zehn unterschiedliche Leistungen des Sozialstaates aufgelistet.
+    Betrachtet sie und zieht sie auf die einzelnen Beträge links. Schätzt ein:
+    Welche Leistung hat die höchsten Ausgaben, welche die zweithöchsten usw.,
+    sodass ihr eine Reihenfolge erstellt. Prüft dann eure Schätzung.
+  </div>
+  <section class="game">
+    <div class="column">
+      <h2>Ausgaben 2025</h2>
+      <div class="slots" id="slots"></div>
     </div>
-
-    <section class="game">
-      <div class="column">
-        <h2>Ausgaben 2025</h2>
-        <div class="slots" id="slots"></div>
-      </div>
-
-      <div class="column">
-        <h2>Noch nicht zugeordnet</h2>
-        <div class="cards" id="cards"></div>
-      </div>
-    </section>
-
-    <div class="buttons">
-      <button id="checkButton" disabled>
-        Reihenfolge prüfen
-      </button>
+    <div class="column">
+      <h2>Noch nicht zugeordnet</h2>
+      <div class="cards" id="cards"></div>
     </div>
-  </main>
+  </section>
+  <div class="buttons">
+    <button id="checkButton" disabled>Reihenfolge prüfen</button>
+  </div>
+</main>
 
-  <!-- Auswertungs-Overlay -->
-  <div class="overlay" id="evaluationOverlay">
-    <div class="overlay-box">
-      <h2>Auswertung</h2>
+<div id="drag-ghost"></div>
 
-      <div id="evaluationContent"></div>
-
-      <button
-        class="overlay-button"
-        id="showResolutionButton">
-        Auflösung anzeigen
-      </button>
-
-      <button
-        class="overlay-button"
-        id="backFromEvaluationButton">
-        Zurück
-      </button>
+<div class="overlay" id="evaluationOverlay">
+  <div class="overlay-box">
+    <h2>Auswertung</h2>
+    <div id="evaluationContent"></div>
+    <div class="overlay-buttons-row">
+      <button class="overlay-button" id="showResolutionButton">Auflösung anzeigen</button>
+      <button class="overlay-button" id="backFromEvaluationButton">Zurück</button>
     </div>
   </div>
+</div>
 
-  <!-- Auflösungs-Overlay -->
-  <div class="overlay" id="resolutionOverlay">
-    <div class="overlay-box">
-      <h2>Auflösung</h2>
-
-      <div id="resolutionContent"></div>
-
-      <button
-        class="overlay-button"
-        id="restartButton">
-        Neustart
-      </button>
-
-      <button
-        class="overlay-button"
-        id="backFromResolutionButton">
-        Zurück
-      </button>
+<div class="overlay" id="resolutionOverlay">
+  <div class="overlay-box">
+    <h2>Auflösung</h2>
+    <div id="resolutionContent"></div>
+    <div class="overlay-buttons-row">
+      <button class="overlay-button" id="restartButton">Neustart</button>
+      <button class="overlay-button" id="backFromResolutionButton">Zurück</button>
     </div>
   </div>
+</div>
 
-  <script>
-    const data = [
-      {
-        id: "rente",
-        name: "Rentenversicherung",
-        value: 430.0,
-        explanation: "Sichert Einkommen im Alter."
-      },
-      {
-        id: "krankenversicherung",
-        name: "Krankenversicherung, gesetzlich",
-        value: 335.0,
-        explanation: "Finanziert medizinische Versorgung."
-      },
-      {
-        id: "pensionen",
-        name: "Pensionen, Beihilfen, Familienzuschläge",
-        value: 105.0,
-        explanation: "Versorgt Beamt:innen und ihre Familien."
-      },
-      {
-        id: "pflegeversicherung",
-        name: "Pflegeversicherung",
-        value: 76.0,
-        explanation: "Unterstützt bei Pflegebedürftigkeit."
-      },
-      {
-        id: "kindergeld",
-        name: "Kindergeld, Elterngeld",
-        value: 69.5,
-        explanation: "Unterstützt Familien mit Kindern."
-      },
-      {
-        id: "buergergeld",
-        name: "Grundsicherung für Arbeitsuchende (Bürgergeld)",
-        value: 60.1,
-        explanation: "Sichert den Lebensunterhalt Arbeitssuchender."
-      },
-      {
-        id: "sozialhilfe",
-        name: "Sozialhilfe",
-        value: 56.5,
-        explanation: "Hilft Menschen ohne ausreichendes Einkommen."
-      },
-      {
-        id: "alg1",
-        name: "Arbeitslosenversicherung (ALG I)",
-        value: 39.0,
-        explanation: "Unterstützt nach Arbeitsplatzverlust."
-      },
-      {
-        id: "wohngeld",
-        name: "Wohngeld",
-        value: 5.5,
-        explanation: "Unterstützt Haushalte bei Wohnkosten."
-      },
-      {
-        id: "ausbildungsfoerderung",
-        name: "Ausbildungsförderung",
-        value: 3.6,
-        explanation: "Unterstützt während der Ausbildung."
+<script>
+/* ─── Daten ──────────────────────────────────────────── */
+const data = [
+  { id: "rente",                 name: "Rentenversicherung",                              value: 430.0, explanation: "Sichert Einkommen im Alter." },
+  { id: "krankenversicherung",   name: "Krankenversicherung, gesetzlich",                 value: 335.0, explanation: "Finanziert medizinische Versorgung." },
+  { id: "pensionen",             name: "Pensionen, Beihilfen, Familienzuschläge",         value: 105.0, explanation: "Versorgt Beamt:innen und ihre Familien." },
+  { id: "pflegeversicherung",    name: "Pflegeversicherung",                              value:  76.0, explanation: "Unterstützt bei Pflegebedürftigkeit." },
+  { id: "kindergeld",            name: "Kindergeld, Elterngeld",                          value:  69.5, explanation: "Unterstützt Familien mit Kindern." },
+  { id: "buergergeld",           name: "Grundsicherung für Arbeitsuchende (Bürgergeld)",  value:  60.1, explanation: "Sichert den Lebensunterhalt Arbeitssuchender." },
+  { id: "sozialhilfe",           name: "Sozialhilfe",                                     value:  56.5, explanation: "Hilft Menschen ohne ausreichendes Einkommen." },
+  { id: "alg1",                  name: "Arbeitslosenversicherung (ALG I)",                value:  39.0, explanation: "Unterstützt nach Arbeitsplatzverlust." },
+  { id: "wohngeld",              name: "Wohngeld",                                        value:   5.5, explanation: "Unterstützt Haushalte bei Wohnkosten." },
+  { id: "ausbildungsfoerderung", name: "Ausbildungsförderung",                            value:   3.6, explanation: "Unterstützt während der Ausbildung." }
+];
+
+/* ─── Hilfsfunktionen ────────────────────────────────── */
+function shuffleArray(array) {
+  const s = [...array];
+  for (let i = s.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [s[i], s[j]] = [s[j], s[i]];
+  }
+  return s;
+}
+function formatNumber(n) {
+  return n.toFixed(1).replace(".", ",");
+}
+function getItem(id) {
+  return data.find(item => item.id === id);
+}
+
+/* ─── Zustand ────────────────────────────────────────── */
+let shuffledData      = shuffleArray(data);
+let placedOrder       = [];
+let gameChecked       = false;
+let lastInsertedIndex = -1;
+
+let draggedId         = null;
+let draggedFromIndex  = null;
+
+/* ─── DOM-Referenzen ─────────────────────────────────── */
+const ghost                    = document.getElementById("drag-ghost");
+const slotsContainer           = document.getElementById("slots");
+const cardsContainer           = document.getElementById("cards");
+const checkButton              = document.getElementById("checkButton");
+const evaluationOverlay        = document.getElementById("evaluationOverlay");
+const evaluationContent        = document.getElementById("evaluationContent");
+const showResolutionButton     = document.getElementById("showResolutionButton");
+const backFromEvaluationButton = document.getElementById("backFromEvaluationButton");
+const resolutionOverlay        = document.getElementById("resolutionOverlay");
+const resolutionContent        = document.getElementById("resolutionContent");
+const restartButton            = document.getElementById("restartButton");
+const backFromResolutionButton = document.getElementById("backFromResolutionButton");
+
+/* ─── Render ─────────────────────────────────────────── */
+function render() {
+  slotsContainer.innerHTML = "";
+  cardsContainer.innerHTML = "";
+
+  data.forEach((amountItem, index) => {
+    const slot = document.createElement("div");
+    slot.className = "slot";
+    slot.dataset.index = index;
+
+    const amount = document.createElement("div");
+    amount.className = "amount";
+    amount.textContent = `${formatNumber(amountItem.value)} Mrd. €`;
+    slot.appendChild(amount);
+
+    const placedId = placedOrder[index];
+    if (placedId) {
+      const item = getItem(placedId);
+      const pc = document.createElement("div");
+      pc.className = "placed-card";
+      pc.dataset.id = item.id;
+      pc.dataset.slotIndex = index;
+      pc.innerHTML = `
+        <div class="card-title">${item.name}</div>
+        <div class="card-explanation">${item.explanation}</div>
+      `;
+      if (lastInsertedIndex === index) {
+        pc.classList.add("inserting");
       }
-    ];
-
-    function shuffleArray(array) {
-      const shuffled = [...array];
-
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const randomIndex = Math.floor(
-          Math.random() * (i + 1)
-        );
-
-        [shuffled[i], shuffled[randomIndex]] =
-          [shuffled[randomIndex], shuffled[i]];
-      }
-
-      return shuffled;
+      addDragListeners(pc, item.id, index);
+      addTouchListeners(pc, item.id, index);
+      slot.appendChild(pc);
+    } else {
+      const hint = document.createElement("div");
+      hint.className = "empty-hint";
+      hint.textContent = "Kachel hierher ziehen …";
+      slot.appendChild(hint);
     }
 
-    let shuffledData = shuffleArray(data);
-    let placedOrder = [];
-    let draggedId = null;
-    let draggedFromIndex = null;
-    let gameChecked = false;
+    slot.addEventListener("dragover", e => {
+      e.preventDefault();
+      slot.classList.add("over");
+    });
+    slot.addEventListener("dragleave", () => slot.classList.remove("over"));
+    slot.addEventListener("drop", e => {
+      e.preventDefault();
+      slot.classList.remove("over");
+      handleDrop(index);
+    });
 
-    const slotsContainer =
-      document.getElementById("slots");
+    slotsContainer.appendChild(slot);
+  });
 
-    const cardsContainer =
-      document.getElementById("cards");
+  /* Rechte Spalte */
+  const unplaced = shuffledData.filter(item => !placedOrder.includes(item.id));
+  unplaced.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.draggable = true;
+    card.dataset.id = item.id;
+    card.innerHTML = `
+      <div class="card-title">${item.name}</div>
+      <div class="card-explanation">${item.explanation}</div>
+    `;
+    addDragListeners(card, item.id, -1);
+    addTouchListeners(card, item.id, -1);
+    cardsContainer.appendChild(card);
+  });
 
-    const checkButton =
-      document.getElementById("checkButton");
+  checkButton.disabled = placedOrder.filter(Boolean).length < data.length;
+  lastInsertedIndex = -1;
+}
 
-    const evaluationOverlay =
-      document.getElementById("evaluationOverlay");
+/* ─── Maus-Drag-Listeners ────────────────────────────── */
+function addDragListeners(el, id, fromIndex) {
+  el.draggable = true;
+  el.addEventListener("dragstart", e => {
+    draggedId        = id;
+    draggedFromIndex = fromIndex;
+    setTimeout(() => el.classList.add("dragging"), 0);
+    e.dataTransfer.effectAllowed = "move";
+  });
+  el.addEventListener("dragend", () => {
+    el.classList.remove("dragging");
+  });
+}
 
-    const evaluationContent =
-      document.getElementById("evaluationContent");
+/* ─── Touch-Listeners ────────────────────────────────── */
+function addTouchListeners(el, id, fromIndex) {
+  el.addEventListener("touchstart", e => {
+    draggedId        = id;
+    draggedFromIndex = fromIndex;
+    const item = getItem(id);
+    ghost.dataset.id = id;
+    ghost.innerHTML = `
+      <div class="card-title">${item.name}</div>
+      <div class="card-explanation">${item.explanation}</div>
+    `;
+    ghost.style.display = "block";
+    el.classList.add("dragging");
+    moveTouchGhost(e.touches[0]);
+  }, { passive: true });
 
-    const showResolutionButton =
-      document.getElementById("showResolutionButton");
+  el.addEventListener("touchmove", e => {
+    e.preventDefault();
+    moveTouchGhost(e.touches[0]);
+  }, { passive: false });
 
-    const backFromEvaluationButton =
-      document.getElementById("backFromEvaluationButton");
-
-    const resolutionOverlay =
-      document.getElementById("resolutionOverlay");
-
-    const resolutionContent =
-      document.getElementById("resolutionContent");
-
-    const restartButton =
-      document.getElementById("restartButton");
-
-    const backFromResolutionButton =
-      document.getElementById("backFromResolutionButton");
-
-    function formatNumber(number) {
-      return number.toFixed(1).replace(".", ",");
-    }
-
-    function getItem(id) {
-      return data.find(item => item.id === id);
-    }
-
-    function render() {
-      slotsContainer.innerHTML = "";
-      cardsContainer.innerHTML = "";
-
-      /*
-       * Linke Spalte:
-       * Die Beträge bleiben fest geordnet.
-       */
-      data.forEach((amountItem, index) => {
-        const slot = document.createElement("div");
-
-        slot.className = "slot";
-        slot.dataset.index = index;
-
-        const amount = document.createElement("div");
-
-        amount.className = "amount";
-        amount.textContent =
-          `${formatNumber(amountItem.value)} Mrd. €`;
-
-        slot.appendChild(amount);
-
-        const placedId = placedOrder[index];
-
-        if (placedId) {
-          const item = getItem(placedId);
-
-          slot.dataset.cardId = item.id;
-
-          slot.innerHTML += `
-            <div
-              class="placed-card"
-              draggable="true"
-              data-id="${item.id}">
-              <div class="card-title">
-                ${item.name}
-              </div>
-              <div class="card-explanation">
-                ${item.explanation}
-              </div>
-            </div>
-          `;
-
-          const placedCard =
-            slot.querySelector(".placed-card");
-
-          addDragEvents(placedCard, index);
-        } else {
-          slot.innerHTML += `
-            <div class="empty-hint">
-              Kachel hier ablegen
-            </div>
-          `;
-        }
-
-        addSlotEvents(slot);
-        slotsContainer.appendChild(slot);
-      });
-
-      /*
-       * Rechte Spalte:
-       * Noch nicht platzierte Karten werden in der
-       * zufällig festgelegten Reihenfolge angezeigt.
-       */
-      shuffledData.forEach(item => {
-        if (placedOrder.includes(item.id)) {
-          return;
-        }
-
-        const card = document.createElement("div");
-
-        card.className = "card";
-        card.draggable = true;
-        card.dataset.id = item.id;
-
-        card.innerHTML = `
-          <div class="card-title">
-            ${item.name}
-          </div>
-          <div class="card-explanation">
-            ${item.explanation}
-          </div>
-        `;
-
-        addDragEvents(card, -1);
-        cardsContainer.appendChild(card);
-      });
-
-      checkButton.disabled =
-        placedOrder.length !== data.length;
-    }
-
-    function addDragEvents(card, fromIndex) {
-      card.addEventListener("dragstart", () => {
-        if (gameChecked) {
-          return;
-        }
-
-        draggedId = card.dataset.id;
-        draggedFromIndex = fromIndex;
-
-        card.classList.add("dragging");
-      });
-
-      card.addEventListener("dragend", () => {
-        card.classList.remove("dragging");
-      });
-    }
-
-    function addSlotEvents(slot) {
-      slot.addEventListener("dragover", event => {
-        if (gameChecked) {
-          return;
-        }
-
-        event.preventDefault();
-        slot.classList.add("over");
-      });
-
-      slot.addEventListener("dragleave", () => {
-        slot.classList.remove("over");
-      });
-
-      slot.addEventListener("drop", event => {
-        event.preventDefault();
-        slot.classList.remove("over");
-
-        if (
-          gameChecked ||
-          !draggedId ||
-          draggedId === placedOrder[slot.dataset.index]
-        ) {
-          return;
-        }
-
-        const targetIndex =
-          Number(slot.dataset.index);
-
-        /*
-         * Wird eine bereits platzierte Kachel verschoben,
-         * wird sie aus ihrer alten Position entfernt.
-         */
-        if (draggedFromIndex >= 0) {
-          placedOrder.splice(draggedFromIndex, 1);
-        }
-
-        /*
-         * Die gezogene Kachel wird an der neuen Position
-         * eingefügt.
-         */
-        placedOrder.splice(targetIndex, 0, draggedId);
-
-        draggedId = null;
-        draggedFromIndex = null;
-
+  el.addEventListener("touchend", e => {
+    ghost.style.display = "none";
+    ghost.removeAttribute("data-id");
+    el.classList.remove("dragging");
+    const touch  = e.changedTouches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const slot   = target ? target.closest(".slot") : null;
+    if (slot) {
+      const slotIndex = parseInt(slot.dataset.index, 10);
+      handleDrop(slotIndex);
+    } else if (target && target.closest("#cards")) {
+      if (draggedFromIndex >= 0) {
+        placedOrder[draggedFromIndex] = null;
         render();
-      });
-    }
-
-    checkButton.addEventListener("click", () => {
-      if (placedOrder.length !== data.length) {
-        return;
       }
+    }
+    draggedId        = null;
+    draggedFromIndex = null;
+  }, { passive: true });
+}
 
-      gameChecked = true;
-      checkButton.disabled = true;
+function moveTouchGhost(touch) {
+  ghost.style.left = touch.clientX + "px";
+  ghost.style.top  = touch.clientY + "px";
+}
 
-      let correctCount = 0;
-      let evaluationHTML = "";
+/* ─── Drop-Logik ─────────────────────────────────────── */
+function handleDrop(targetIndex) {
+  if (draggedId === null) return;
 
-      placedOrder.forEach((id, position) => {
-        const estimatedItem = getItem(id);
-        const correctItem = data[position];
-
-        if (estimatedItem.id === correctItem.id) {
-          correctCount++;
-
-          evaluationHTML += `
-            <div class="evaluation-item correct-line">
-              <strong>Position ${position + 1}:</strong>
-              ${estimatedItem.name} –
-              richtig eingeordnet
-            </div>
-          `;
-        } else {
-          const difference =
-            correctItem.value - estimatedItem.value;
-
-          let className;
-          let text;
-
-          if (difference > 0) {
-            className = "underestimated";
-            text = `
-              um ${formatNumber(Math.abs(difference))}
-              Mrd. € unterschätzt
-            `;
-          } else {
-            className = "overestimated";
-            text = `
-              um ${formatNumber(Math.abs(difference))}
-              Mrd. € überschätzt
-            `;
-          }
-
-          evaluationHTML += `
-            <div class="evaluation-item ${className}">
-              <strong>Position ${position + 1}:</strong>
-              ${estimatedItem.name}
-              <br>
-              ${text}
-              <br>
-              <small>
-                Zugeordnet:
-                ${formatNumber(correctItem.value)} Mrd. €
-                |
-                Tatsächlicher Wert:
-                ${formatNumber(estimatedItem.value)} Mrd. €
-              </small>
-            </div>
-          `;
-        }
-      });
-
-      evaluationContent.innerHTML = `
-        <p class="center">
-          ${correctCount} von ${data.length}
-          Positionen sind richtig.
-        </p>
-        ${evaluationHTML}
-      `;
-
-      evaluationOverlay.classList.add("show");
-    });
-
-    /*
-     * Öffnet die Auflösung.
-     */
-    showResolutionButton.addEventListener("click", () => {
-      let tableHTML = `
-        <table>
-          <thead>
-            <tr>
-              <th>Richtige Position</th>
-              <th>Baustein</th>
-              <th>Erläuterung</th>
-              <th>Ausgaben 2025</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      data.forEach((item, index) => {
-        tableHTML += `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${item.name}</td>
-            <td>${item.explanation}</td>
-            <td>${formatNumber(item.value)} Mrd. €</td>
-          </tr>
-        `;
-      });
-
-      tableHTML += `
-          </tbody>
-        </table>
-      `;
-
-      resolutionContent.innerHTML = tableHTML;
-
-      evaluationOverlay.classList.remove("show");
-      resolutionOverlay.classList.add("show");
-    });
-
-    /*
-     * Zurück aus dem Auswertungs-Overlay:
-     * Das Overlay wird geschlossen und die Drag-and-drop-
-     * Übung wieder freigeschaltet. Die bisherige Reihenfolge
-     * bleibt erhalten und kann verändert werden.
-     */
-    backFromEvaluationButton.addEventListener("click", () => {
-      evaluationOverlay.classList.remove("show");
-
-      gameChecked = false;
-      checkButton.disabled =
-        placedOrder.length !== data.length;
-
-      render();
-    });
-
-    /*
-     * Zurück aus dem Auflösungs-Overlay:
-     * Die Auflösung wird geschlossen und die Auswertung
-     * wieder angezeigt.
-     */
-    backFromResolutionButton.addEventListener("click", () => {
-      resolutionOverlay.classList.remove("show");
-      evaluationOverlay.classList.add("show");
-    });
-
-    /*
-     * Neustart:
-     * Die Übung wird vollständig zurückgesetzt und die Karten
-     * werden erneut gemischt.
-     */
-    restartButton.addEventListener("click", () => {
-      placedOrder = [];
-      draggedId = null;
-      draggedFromIndex = null;
-      gameChecked = false;
-      shuffledData = shuffleArray(data);
-
-      evaluationOverlay.classList.remove("show");
-      resolutionOverlay.classList.remove("show");
-
-      render();
-    });
-
+  if (draggedFromIndex >= 0) {
+    const existingId = placedOrder[targetIndex] || null;
+    placedOrder[draggedFromIndex] = existingId;
+    placedOrder[targetIndex]      = draggedId;
+    lastInsertedIndex = targetIndex;
+    draggedId        = null;
+    draggedFromIndex = null;
     render();
-  </script>
+    return;
+  }
+
+  let freeIndex = -1;
+  for (let i = targetIndex; i < data.length; i++) {
+    if (!placedOrder[i]) { freeIndex = i; break; }
+  }
+  if (freeIndex === -1) freeIndex = data.length - 1;
+
+  for (let i = freeIndex; i > targetIndex; i--) {
+    placedOrder[i] = placedOrder[i - 1];
+  }
+  placedOrder[targetIndex] = draggedId;
+  lastInsertedIndex = targetIndex;
+  draggedId        = null;
+  draggedFromIndex = null;
+  render();
+}
+
+/* ─── Ranking ────────────────────────────────────────── */
+function buildRanking() {
+  return [...data].sort((a, b) => b.value - a.value);
+}
+
+/* ─── Prüfen ─────────────────────────────────────────── */
+checkButton.addEventListener("click", () => {
+  const ranking = buildRanking();
+  let html = "";
+
+  placedOrder.forEach((id, slotIndex) => {
+    const placed  = getItem(id);
+    const correct = ranking[slotIndex];
+    const rank    = slotIndex + 1;
+
+    if (placed.id === correct.id) {
+      html += `
+        <div class="evaluation-item correct-line">
+          ✅ Platz ${rank}: <strong>${placed.name}</strong> –
+          korrekt! (${formatNumber(placed.value)} Mrd. €)
+        </div>`;
+    } else if (placed.value > correct.value) {
+      html += `
+        <div class="evaluation-item overestimated">
+          🔼 Platz ${rank}: Du hast <strong>${placed.name}</strong> eingeordnet
+          (${formatNumber(placed.value)} Mrd. €), aber richtig wäre
+          <strong>${correct.name}</strong>
+          (${formatNumber(correct.value)} Mrd. €) – überschätzt.
+        </div>`;
+    } else {
+      html += `
+        <div class="evaluation-item underestimated">
+          🔽 Platz ${rank}: Du hast <strong>${placed.name}</strong> eingeordnet
+          (${formatNumber(placed.value)} Mrd. €), aber richtig wäre
+          <strong>${correct.name}</strong>
+          (${formatNumber(correct.value)} Mrd. €) – unterschätzt.
+        </div>`;
+    }
+  });
+
+  const correct = placedOrder.filter((id, i) => id === buildRanking()[i].id).length;
+  html += `<p class="center"><strong>${correct} von ${data.length} Positionen</strong> korrekt platziert.</p>`;
+
+  evaluationContent.innerHTML = html;
+  evaluationOverlay.classList.add("show");
+  gameChecked = true;
+});
+
+/* ─── Auflösung ──────────────────────────────────────── */
+showResolutionButton.addEventListener("click", () => {
+  const ranking = buildRanking();
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Rang</th>
+          <th>Leistung</th>
+          <th>Ausgaben 2025</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  ranking.forEach((item, i) => {
+    html += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${item.name}</td>
+        <td>${formatNumber(item.value)} Mrd. €</td>
+        <td>${item.explanation}</td>
+      </tr>`;
+  });
+  html += `</tbody></table>`;
+  resolutionContent.innerHTML = html;
+  evaluationOverlay.classList.remove("show");
+  resolutionOverlay.classList.add("show");
+});
+
+/* ─── Navigation ─────────────────────────────────────── */
+backFromEvaluationButton.addEventListener("click", () => {
+  evaluationOverlay.classList.remove("show");
+});
+backFromResolutionButton.addEventListener("click", () => {
+  resolutionOverlay.classList.remove("show");
+  evaluationOverlay.classList.add("show");
+});
+restartButton.addEventListener("click", () => {
+  placedOrder       = [];
+  shuffledData      = shuffleArray(data);
+  gameChecked       = false;
+  lastInsertedIndex = -1;
+  resolutionOverlay.classList.remove("show");
+  evaluationOverlay.classList.remove("show");
+  render();
+});
+
+/* ─── Start ──────────────────────────────────────────── */
+placedOrder = new Array(data.length).fill(null);
+render();
+</script>
 </body>
 </html>
