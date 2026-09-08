@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test: Gerechtigkeit</title>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --background: #f1f5f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #f59e0b;
+      --border: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--background);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .app {
+      width: min(900px, 94%);
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      color: var(--primary-dark);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .intro {
+      color: var(--muted);
+    }
+
+    .quiz-card,
+    .result-card,
+    .start-card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .progress-track {
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    #progressBar {
+      width: 0%;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .timer-area {
+      margin: 18px 0 24px;
+    }
+
+    .timer-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    #timeText {
+      color: var(--primary-dark);
+      font-size: 1.1rem;
+    }
+
+    .timer-track {
+      height: 18px;
+      background: #fee2e2;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    /*
+      Der Zeitbalken wird kontinuierlich und fließend verkleinert.
+      Die Breite wird alle 50 Millisekunden aktualisiert.
+    */
+    #timerBar {
+      height: 100%;
+      width: 100%;
+      background: var(--success);
+      transition:
+        width 0.05s linear,
+        background-color 0.3s ease;
+    }
+
+    #timerBar.warning {
+      background: var(--warning);
+    }
+
+    #timerBar.danger {
+      background: var(--danger);
+    }
+
+    .unlimited {
+      padding: 14px;
+      border-radius: 10px;
+      background: #ecfdf5;
+      color: #166534;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .question-number {
+      color: var(--primary);
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      line-height: 1.5;
+      margin: 0 0 22px;
+      white-space: pre-line;
+    }
+
+    .answer-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .answer-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      white-space: pre-line;
+    }
+
+    .answer-option:hover {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .answer-option input {
+      margin-top: 3px;
+      transform: scale(1.2);
+      accent-color: var(--primary);
+    }
+
+    .answer-option.selected {
+      border-color: var(--primary);
+      background: #dbeafe;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 190px;
+      resize: vertical;
+      padding: 14px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font: inherit;
+      line-height: 1.5;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 13px 20px;
+      font: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button.secondary {
+      background: #64748b;
+    }
+
+    button.secondary:hover {
+      background: #475569;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .start-card {
+      text-align: center;
+    }
+
+    .start-card ul {
+      text-align: left;
+      line-height: 1.7;
+      max-width: 620px;
+      margin: 20px auto;
+    }
+
+    .result-summary {
+      text-align: center;
+      padding: 18px;
+      background: #eff6ff;
+      border-radius: 14px;
+      margin-bottom: 24px;
+    }
+
+    .score {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary-dark);
+    }
+
+    .result-item {
+      border-left: 5px solid var(--border);
+      padding: 12px 16px;
+      margin: 12px 0;
+      background: #f8fafc;
+      border-radius: 8px;
+      line-height: 1.5;
+    }
+
+    .result-item.correct {
+      border-left-color: var(--success);
+    }
+
+    .result-item.incorrect {
+      border-left-color: var(--danger);
+    }
+
+    .result-item.open {
+      border-left-color: var(--warning);
+    }
+
+    .result-item strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 600px) {
+      .app {
+        width: 96%;
+        padding-top: 12px;
+      }
+
+      .quiz-card,
+      .result-card,
+      .start-card {
+        padding: 20px;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .progress-info {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+
+    <!-- Startseite -->
+    <section id="startScreen" class="start-card">
+      <h2>Hinweise zum Test</h2>
+
+      <ul>
+        <li>Der Test besteht aus sechs Aufgaben.</li>
+        <li>Bei Frage 5 sind mehrere Antworten richtig.</li>
+        <li>Die letzte Aufgabe ist eine offene Frage ohne Zeitbegrenzung.</li>
+      </ul>
+
+      <button id="startButton">Test starten</button>
+    </section>
+
+    <!-- Quizseite -->
+    <section id="quizScreen" class="quiz-card hidden">
+
+      <div class="progress-info">
+        <span id="questionCounter">Frage 1 von 6</span>
+        <span id="answeredCounter">Beantwortet: 0</span>
+      </div>
+
+      <div class="progress-track">
+        <div id="progressBar"></div>
+      </div>
+
+      <!-- Zeitbalken für Fragen 1 bis 5 -->
+      <div id="timerArea" class="timer-area">
+        <div class="timer-label">
+          <span>Verbleibende Zeit</span>
+          <span id="timeText">45 Sekunden</span>
+        </div>
+
+        <div class="timer-track">
+          <div id="timerBar"></div>
+        </div>
+      </div>
+
+      <!-- Hinweis für die letzte Aufgabe -->
+      <div id="unlimitedArea" class="unlimited hidden">
+        Für diese Aufgabe gibt es keine Zeitbegrenzung.
+      </div>
+
+      <div id="questionNumber" class="question-number"></div>
+      <p id="questionText" class="question-text"></p>
+
+      <div id="answerList" class="answer-list"></div>
+
+      <div class="button-row">
+        <button id="backButton" class="secondary">Zurück</button>
+        <button id="nextButton">Weiter</button>
+      </div>
+    </section>
+
+    <!-- Auswertung -->
+    <section id="resultScreen" class="result-card hidden">
+      <h2>Auswertung</h2>
+
+      <div class="result-summary">
+        <div class="score" id="scoreText"></div>
+        <p id="percentageText"></p>
+        <p id="resultMessage"></p>
+      </div>
+
+      <div id="resultDetails"></div>
+
+      <div class="button-row">
+        <button id="restartButton">Test wiederholen</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const questions = [
+      {
+        type: "single",
+        question: "Welches „Paket“ ist korrekt?",
+        options: [
+          "Existenzsicherung für Bedürftige – Leistungsgerechtigkeit\nGleiche Verfahren für alle – Regelgerechtigkeit\nGerechte Bildungschancen – Verteilungsgerechtigkeit",
+
+          "Höheres Einkommen aufgrund höherer Leistung – Leistungsgerechtigkeit\nUnterstützung entsprechend der individuellen Lage – Bedarfsgerechtigkeit\nGerechte Bildungschancen – Chancengerechtigkeit",
+
+          "Möglichst gleiche Vermögensverteilung – Regelgerechtigkeit\nGleiche Rechte und Pflichten – Chancengerechtigkeit\nSchadensersatz nach einem Rechtsbruch – Leistungsgerechtigkeit",
+
+          "Zugang zu Bildung unabhängig sozialer Herkunft – Verteilungsgerechtigkeit\nBestrafung eines Rechtsbruchs – Bedarfsgerechtigkeit\nGleiche Regeln für alle – Regelgerechtigkeit"
+        ],
+        correct: [1]
+      },
+
+      {
+        type: "single",
+        question: "Eine Schule verteilt allen Schüler:innen dieselben Lernmaterialien und setzt für alle dieselben Prüfungsbedingungen fest. Schüler:innen mit einer Sehbehinderung erhalten keine zusätzlichen Hilfsmittel.\n\nWelche Aussage trifft zu?",
+        options: [
+          "Die Maßnahme verwirklicht Equity, weil alle exakt gleich behandelt werden.",
+
+          "Die Maßnahme verwirklicht Equality, kann aber im Ergebnis ungerecht sein, weil unterschiedliche Voraussetzungen unberücksichtigt bleiben.",
+
+          "Die Maßnahme verwirklicht weder Equality noch Equity, weil Gleichbehandlung grundsätzlich ungerecht ist.",
+
+          "Die Maßnahme verwirklicht automatisch Chancengerechtigkeit, weil gleiche Regeln immer gleiche Chancen erzeugen."
+        ],
+        correct: [1]
+      },
+
+      {
+        type: "single",
+        question: "Welche Aussage beschreibt einen Zielkonflikt zwischen Gerechtigkeitsdimensionen?",
+        options: [
+          "Bedarfsgerechtigkeit und Leistungsgerechtigkeit können in Spannung geraten, wenn eine Person trotz geringer eigener Leistung ein existenzsicherndes Einkommen erhalten soll.",
+
+          "Regelgerechtigkeit und Chancengerechtigkeit schließen einander grundsätzlich aus.",
+
+          "Generationengerechtigkeit bedeutet, dass jede Generation exakt dieselben Einkommen erhalten muss.",
+
+          "Verteilungsgerechtigkeit verlangt immer vollständige Gleichheit und lässt keinerlei Leistungsunterschiede zu."
+        ],
+        correct: [0]
+      },
+
+      {
+        type: "single",
+        question: "Beurteile die Aussage:\n\n„Wenn der Gini-Koeffizient der Einkommensverteilung stabil bleibt, kann es keine soziale Ungerechtigkeit geben.“",
+        options: [
+          "Die Aussage ist richtig, weil der Gini-Koeffizient soziale Gerechtigkeit vollständig misst.",
+
+          "Die Aussage ist richtig, weil stabile Ungleichheit automatisch gerechtfertigte Ungleichheit bedeutet.",
+
+          "Die Aussage ist falsch, weil der Gini-Koeffizient nur einen Teil der Verteilungsstruktur erfasst.",
+
+          "Die Aussage ist falsch, weil ein Gini-Koeffizient von 0,3 vollständige Gleichheit bedeutet."
+        ],
+        correct: [2]
+      },
+
+      {
+        type: "multiple",
+        question: "Welche Aussagen treffen zu?",
+        options: [
+          "Austeilende Gerechtigkeit betrifft die grundsätzliche Verteilung von Gütern, Rechten und Pflichten.",
+
+          "Ausgleichende Gerechtigkeit kann beispielsweise durch Schadensersatz oder Strafen verwirklicht werden.",
+
+          "Bedarfsgerechtigkeit verlangt, dass alle Menschen unabhängig von ihrem Bedarf dasselbe erhalten.",
+
+          "Regelgerechtigkeit orientiert sich am Ideal gleicher Rechte und Pflichten.",
+
+          "Chancengerechtigkeit bedeutet, dass am Ende alle Menschen exakt dasselbe Ergebnis erreichen."
+        ],
+        correct: [0, 1, 3]
+      },
+
+      {
+        type: "text",
+        question: "Der Staat führt folgende Regel ein:\n\nBürgergeld wird nur noch vollständig ausgezahlt, wenn Leistungsbezieher:innen regelmäßig an digitalen Arbeitsverfügbarkeitsprüfungen und Fortbildungen teilnehmen.\n\nBeurteile diese Regel aus der Perspektive von Bedarfsgerechtigkeit und Leistungsgerechtigkeit.",
+        correct: []
+      }
+    ];
+
+    const TIMED_QUESTIONS = 5;
+    const MAX_TIME_SECONDS = 45;
+    const TIMER_INTERVAL_MS = 50;
+
+    let currentQuestion = 0;
+    let answers = [];
+    let timer = null;
+    let remainingMilliseconds = MAX_TIME_SECONDS * 1000;
+
+    const startScreen = document.getElementById("startScreen");
+    const quizScreen = document.getElementById("quizScreen");
+    const resultScreen = document.getElementById("resultScreen");
+
+    const startButton = document.getElementById("startButton");
+    const backButton = document.getElementById("backButton");
+    const nextButton = document.getElementById("nextButton");
+    const restartButton = document.getElementById("restartButton");
+
+    const questionCounter = document.getElementById("questionCounter");
+    const answeredCounter = document.getElementById("answeredCounter");
+    const progressBar = document.getElementById("progressBar");
+
+    const timerArea = document.getElementById("timerArea");
+    const unlimitedArea = document.getElementById("unlimitedArea");
+    const timerBar = document.getElementById("timerBar");
+    const timeText = document.getElementById("timeText");
+
+    const questionNumber = document.getElementById("questionNumber");
+    const questionText = document.getElementById("questionText");
+    const answerList = document.getElementById("answerList");
+
+    startButton.addEventListener("click", startTest);
+    nextButton.addEventListener("click", nextQuestion);
+    backButton.addEventListener("click", previousQuestion);
+    restartButton.addEventListener("click", restartTest);
+
+    function startTest() {
+      currentQuestion = 0;
+      answers = Array(questions.length).fill(null);
+
+      startScreen.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+
+      showQuestion();
+    }
+
+    function showQuestion() {
+      stopTimer();
+
+      const question = questions[currentQuestion];
+      const isLastQuestion = currentQuestion === questions.length - 1;
+
+      questionCounter.textContent =
+        `Frage ${currentQuestion + 1} von ${questions.length}`;
+
+      questionNumber.textContent =
+        `Frage ${currentQuestion + 1}`;
+
+      questionText.textContent = question.question;
+
+      progressBar.style.width =
+        `${((currentQuestion + 1) / questions.length) * 100}%`;
+
+      answerList.innerHTML = "";
+
+      if (isLastQuestion) {
+        timerArea.classList.add("hidden");
+        unlimitedArea.classList.remove("hidden");
+      } else {
+        timerArea.classList.remove("hidden");
+        unlimitedArea.classList.add("hidden");
+      }
+
+      if (question.type === "text") {
+        createTextAnswer(question);
+      } else {
+        createChoiceAnswers(question);
+      }
+
+      backButton.disabled = currentQuestion === 0;
+
+      nextButton.textContent = isLastQuestion
+        ? "Test auswerten"
+        : "Weiter";
+
+      updateAnsweredCounter();
+
+      if (!isLastQuestion) {
+        startTimer();
+      }
+    }
+
+    function createTextAnswer(question) {
+      const textarea = document.createElement("textarea");
+
+      textarea.id = "textAnswer";
+      textarea.placeholder =
+        "Beurteile die Regel aus Sicht der Bedarfsgerechtigkeit und der Leistungsgerechtigkeit.";
+
+      if (typeof answers[currentQuestion] === "string") {
+        textarea.value = answers[currentQuestion];
+      }
+
+      textarea.addEventListener("input", () => {
+        answers[currentQuestion] = textarea.value;
+        updateAnsweredCounter();
+      });
+
+      answerList.appendChild(textarea);
+    }
+
+    function createChoiceAnswers(question) {
+      question.options.forEach((option, index) => {
+        const label = document.createElement("label");
+        label.className = "answer-option";
+
+        const input = document.createElement("input");
+
+        input.type = question.type === "multiple"
+          ? "checkbox"
+          : "radio";
+
+        input.name = "answer";
+        input.value = index;
+
+        const savedAnswer = answers[currentQuestion] || [];
+
+        if (savedAnswer.includes(index)) {
+          input.checked = true;
+          label.classList.add("selected");
+        }
+
+        input.addEventListener("change", () => {
+          if (question.type === "multiple") {
+            answers[currentQuestion] = [
+              ...document.querySelectorAll(
+                'input[name="answer"]:checked'
+              )
+            ].map(element => Number(element.value));
+          } else {
+            answers[currentQuestion] = [Number(input.value)];
+          }
+
+          document.querySelectorAll(".answer-option").forEach(optionLabel => {
+            optionLabel.classList.remove("selected");
+          });
+
+          document.querySelectorAll(
+            'input[name="answer"]:checked'
+          ).forEach(checkedInput => {
+            checkedInput
+              .closest(".answer-option")
+              .classList.add("selected");
+          });
+
+          updateAnsweredCounter();
+        });
+
+        const span = document.createElement("span");
+        span.textContent = option;
+
+        label.appendChild(input);
+        label.appendChild(span);
+
+        answerList.appendChild(label);
+      });
+    }
+
+    function startTimer() {
+      remainingMilliseconds = MAX_TIME_SECONDS * 1000;
+      updateTimerDisplay();
+
+      timer = setInterval(() => {
+        remainingMilliseconds -= TIMER_INTERVAL_MS;
+
+        if (remainingMilliseconds <= 0) {
+          remainingMilliseconds = 0;
+          updateTimerDisplay();
+          stopTimer();
+
+          // Automatisch zur nächsten Frage
+          nextQuestion();
+          return;
+        }
+
+        updateTimerDisplay();
+      }, TIMER_INTERVAL_MS);
+    }
+
+    function stopTimer() {
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const percentage =
+        (remainingMilliseconds / (MAX_TIME_SECONDS * 1000)) * 100;
+
+      timerBar.style.width = `${percentage}%`;
+
+      const seconds = Math.ceil(remainingMilliseconds / 1000);
+
+      timeText.textContent =
+        `${seconds} ${seconds === 1 ? "Sekunde" : "Sekunden"}`;
+
+      timerBar.classList.remove("warning", "danger");
+
+      if (remainingMilliseconds <= 10000) {
+        timerBar.classList.add("danger");
+      } else if (remainingMilliseconds <= 20000) {
+        timerBar.classList.add("warning");
+      }
+    }
+
+    function saveCurrentAnswer() {
+      const textarea = document.getElementById("textAnswer");
+
+      if (textarea) {
+        answers[currentQuestion] = textarea.value;
+      }
+    }
+
+    function nextQuestion() {
+      saveCurrentAnswer();
+      stopTimer();
+
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        showQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function previousQuestion() {
+      saveCurrentAnswer();
+      stopTimer();
+
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        showQuestion();
+      }
+    }
+
+    function updateAnsweredCounter() {
+      const answered = answers.filter(answer => {
+        if (Array.isArray(answer)) {
+          return answer.length > 0;
+        }
+
+        return typeof answer === "string" &&
+          answer.trim().length > 0;
+      }).length;
+
+      answeredCounter.textContent =
+        `Beantwortet: ${answered}`;
+    }
+
+    function arraysEqual(firstArray, secondArray) {
+      if (!Array.isArray(firstArray) ||
+          !Array.isArray(secondArray)) {
+        return false;
+      }
+
+      if (firstArray.length !== secondArray.length) {
+        return false;
+      }
+
+      const first = [...firstArray].sort((a, b) => a - b);
+      const second = [...secondArray].sort((a, b) => a - b);
+
+      return first.every((value, index) => value === second[index]);
+    }
+
+    function evaluateTextAnswer(answer) {
+      if (!answer || !answer.trim()) {
+        return {
+          points: 0,
+          maxPoints: 2,
+          status: "incorrect",
+          feedback: "Keine Antwort abgegeben."
+        };
+      }
+
+      const text = answer.toLowerCase();
+
+      const mentionsNeed =
+        text.includes("bedarf") ||
+        text.includes("bedarfsgerecht") ||
+        text.includes("existenz") ||
+        text.includes("notwendig") ||
+        text.includes("soziale lage");
+
+      const mentionsPerformance =
+        text.includes("leistung") ||
+        text.includes("leistungsgerecht") ||
+        text.includes("mitwirkung") ||
+        text.includes("fortbildung") ||
+        text.includes("anstrengung") ||
+        text.includes("arbeitsbereitschaft");
+
+      const givesAssessment =
+        text.includes("gerecht") ||
+        text.includes("ungerecht") ||
+        text.includes("problem") ||
+        text.includes("kritik") ||
+        text.includes("bedingung") ||
+        text.includes("teilnahme");
+
+      let points = 0;
+
+      if (mentionsNeed) {
+        points++;
+      }
+
+      if (mentionsPerformance || givesAssessment) {
+        points++;
+      }
+
+      return {
+        points,
+        maxPoints: 2,
+        status: points === 2 ? "correct" : "open",
+        feedback: points === 2
+          ? "Die Antwort berücksichtigt Bedarfsgerechtigkeit und Leistungsgerechtigkeit."
+          : "Die Antwort sollte beide Gerechtigkeitsperspektiven ausdrücklich erläutern."
+      };
+    }
+
+    function showResults() {
+      stopTimer();
+
+      quizScreen.classList.add("hidden");
+      resultScreen.classList.remove("hidden");
+
+      let score = 0;
+      let maxScore = 0;
+      let details = "";
+
+      questions.forEach((question, index) => {
+        const answer = answers[index];
+
+        if (question.type === "text") {
+          const evaluation = evaluateTextAnswer(answer);
+
+          score += evaluation.points;
+          maxScore += evaluation.maxPoints;
+
+          details += `
+            <div class="result-item ${evaluation.status}">
+              <strong>
+                Frage ${index + 1}: ${evaluation.points}/${evaluation.maxPoints} Punkte
+              </strong>
+
+              <div>
+                <b>Deine Antwort:</b>
+                ${
+                  answer && answer.trim()
+                    ? escapeHtml(answer)
+                    : "Keine Antwort"
+                }
+              </div>
+
+              <p class="small-note">
+                ${evaluation.feedback}
+              </p>
+            </div>
+          `;
+
+          return;
+        }
+
+        maxScore++;
+
+        const isCorrect = arraysEqual(
+          answer || [],
+          question.correct
+        );
+
+        if (isCorrect) {
+          score++;
+        }
+
+        const givenAnswer = answer && answer.length
+          ? answer
+              .map(number => question.options[number])
+              .join(" | ")
+          : "Keine Antwort";
+
+        const correctAnswer = question.correct
+          .map(number => question.options[number])
+          .join(" | ");
+
+        details += `
+          <div class="result-item ${
+            isCorrect ? "correct" : "incorrect"
+          }">
+            <strong>
+              Frage ${index + 1}: ${
+                isCorrect ? "Richtig" : "Falsch"
+              }
+            </strong>
+
+            <div>
+              <b>Deine Antwort:</b>
+              ${escapeHtml(givenAnswer)}
+            </div>
+
+            <div>
+              <b>Richtige Antwort:</b>
+              ${escapeHtml(correctAnswer)}
+            </div>
+          </div>
+        `;
+      });
+
+      const percentage = Math.round((score / maxScore) * 100);
+
+      document.getElementById("scoreText").textContent =
+        `${score} von ${maxScore} Punkten`;
+
+      document.getElementById("percentageText").textContent =
+        `Das entspricht ${percentage} %.`;
+
+      let message;
+
+      if (percentage >= 85) {
+        message = "Sehr gute Leistung!";
+      } else if (percentage >= 65) {
+        message = "Gute Leistung. Einige Inhalte kannst du noch wiederholen.";
+      } else if (percentage >= 50) {
+        message = "Bestanden. Eine Wiederholung der Themen ist empfehlenswert.";
+      } else {
+        message = "Die Inhalte sollten noch einmal gründlich wiederholt werden.";
+      }
+
+      document.getElementById("resultMessage").textContent = message;
+      document.getElementById("resultDetails").innerHTML = details;
+    }
+
+    function restartTest() {
+      stopTimer();
+
+      currentQuestion = 0;
+      answers = [];
+
+      resultScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
