@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Übung: Sozialbudget, Sozialleistungsquote und rechtliche Grundlage des Sozialstaats</title>
+
+  <style>
+  :root {
+    --background-dark: #111827;
+    --background-light: #1e293b;
+    --card: #ffffff;
+    --card-soft: #f8fafc;
+
+    --primary: #7c3aed;
+    --primary-dark: #5b21b6;
+    --primary-light: #ede9fe;
+
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #dbe3ef;
+
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(
+        circle at top right,
+        rgba(124, 58, 237, 0.35),
+        transparent 100%
+      ),
+      linear-gradient(
+        135deg,
+        var(--background-dark),
+        var(--background-light)
+      );
+    color: var(--text);
+    font-family:
+      Inter,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+  }
+
+  .app {
+    width: min(980px, 94%);
+    margin: 0 auto;
+    padding: 34px 0 50px;
+  }
+
+  header {
+    position: relative;
+    margin-bottom: 28px;
+    padding: 28px 25px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: center;
+    backdrop-filter: blur(12px);
+  }
+
+  header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 12%;
+    right: 12%;
+    height: 4px;
+    border-radius: 0 0 10px 10px;
+    background: linear-gradient(
+      90deg,
+      #a78bfa,
+      #7c3aed,
+      #4f46e5
+    );
+  }
+
+  header h1 {
+    margin: 0 0 10px;
+    color: white;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: -0.04em;
+  }
+
+  header .subtitle {
+    margin: 0;
+    color: #ddd6fe;
+    line-height: 1.6;
+  }
+
+  h2 {
+    margin-top: 0;
+    color: #312e81;
+  }
+
+  .card {
+    overflow: hidden;
+    background: var(--card);
+    border-radius: 24px;
+    box-shadow:
+      0 25px 60px rgba(0, 0, 0, 0.25),
+      0 5px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .start-card,
+  .result-card {
+    padding: 38px;
+  }
+
+  .quiz-card {
+    padding: 0;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  .start-card {
+    text-align: center;
+  }
+
+  .start-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .start-card ul {
+    max-width: 720px;
+    margin: 26px auto;
+    padding: 0;
+    text-align: left;
+    line-height: 1.75;
+    color: #475569;
+  }
+
+  .start-card li {
+    margin: 8px 0;
+    padding-left: 5px;
+  }
+
+  .info-box {
+    max-width: 750px;
+    margin: 22px auto;
+    padding: 17px 20px;
+    border: 1px solid #c4b5fd;
+    border-left: 5px solid var(--primary);
+    border-radius: 12px;
+    background: var(--primary-light);
+    color: #4c1d95;
+    line-height: 1.6;
+    text-align: left;
+  }
+
+  /*
+    Kopfbereich der Quizkarte
+  */
+
+  .quiz-card > *:not(.quiz-card::before) {
+    /* Nur zur besseren Lesbarkeit im Quelltext */
+  }
+
+  .progress-info,
+  .progress-track,
+  .timer-area,
+  .unlimited,
+  .question-number,
+  .question-text,
+  .answer-list,
+  .button-row {
+    margin-left: 34px;
+    margin-right: 34px;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding-top: 27px;
+    margin-bottom: 10px;
+    color: #475569;
+    font-size: 0.95rem;
+    font-weight: 750;
+  }
+
+  #questionCounter {
+    color: var(--primary-dark);
+  }
+
+  #answeredCounter {
+    color: var(--muted);
+  }
+
+  .progress-track {
+    height: 9px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: #e2e8f0;
+    margin-bottom: 28px;
+  }
+
+  #progressBar {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      #8b5cf6,
+      #6366f1
+    );
+    transition: width 0.35s ease;
+  }
+
+  .timer-area {
+    margin-top: 12px;
+    margin-bottom: 28px;
+    padding: 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+    background: #f8fafc;
+  }
+
+  .timer-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 10px;
+    color: #475569;
+    font-size: 0.92rem;
+    font-weight: 750;
+  }
+
+  #timeText {
+    color: var(--primary-dark);
+  }
+
+  .timer-track {
+    height: 15px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: #fee2e2;
+  }
+
+  #timerBar {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      #10b981,
+      #34d399
+    );
+    transition:
+      width 0.05s linear,
+      background 0.35s ease;
+  }
+
+  #timerBar.warning {
+    background: linear-gradient(
+      90deg,
+      #f59e0b,
+      #fbbf24
+    );
+  }
+
+  #timerBar.danger {
+    background: linear-gradient(
+      90deg,
+      #dc2626,
+      #f87171
+    );
+  }
+
+  .unlimited {
+    margin-top: 22px;
+    margin-bottom: 28px;
+    padding: 15px 18px;
+    border: 1px solid #86efac;
+    border-radius: 13px;
+    background: #ecfdf5;
+    color: #166534;
+    text-align: center;
+    font-weight: 750;
+  }
+
+  .question-number {
+    margin-top: 28px;
+    margin-bottom: 8px;
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .question-text {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #172033;
+    font-size: clamp(1.12rem, 2vw, 1.35rem);
+    font-weight: 650;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+
+  .answer-list {
+    display: grid;
+    gap: 13px;
+  }
+
+  .answer-option {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding: 17px 18px;
+    border: 2px solid var(--border);
+    border-radius: 15px;
+    background: white;
+    color: #334155;
+    cursor: pointer;
+    line-height: 1.5;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+    white-space: pre-line;
+  }
+
+  .answer-option:hover {
+    border-color: #a78bfa;
+    background: #faf5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(124, 58, 237, 0.12);
+  }
+
+  .answer-option.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    box-shadow: 0 5px 15px rgba(124, 58, 237, 0.14);
+  }
+
+  .answer-option input {
+    margin-top: 4px;
+    flex-shrink: 0;
+    transform: scale(1.2);
+    accent-color: var(--primary);
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 250px;
+    padding: 17px;
+    border: 2px solid var(--border);
+    border-radius: 15px;
+    background: #ffffff;
+    color: var(--text);
+    resize: vertical;
+    font: inherit;
+    line-height: 1.6;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  textarea::placeholder {
+    color: #94a3b8;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.13);
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 13px;
+    margin-top: 30px;
+    padding-bottom: 34px;
+  }
+
+  button {
+    min-width: 140px;
+    padding: 14px 22px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(
+      135deg,
+      var(--primary),
+      #4f46e5
+    );
+    color: white;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(79, 70, 229, 0.25);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      filter 0.15s ease;
+  }
+
+  button:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 9px 19px rgba(79, 70, 229, 0.35);
+  }
+
+  button:active {
+    transform: translateY(0);
+  }
+
+  button.secondary {
+    background: #64748b;
+    box-shadow: 0 5px 12px rgba(71, 85, 105, 0.2);
+  }
+
+  button.secondary:hover {
+    background: #475569;
+  }
+
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .result-card h2 {
+    text-align: center;
+    color: #312e81;
+  }
+
+  .result-summary {
+    padding: 25px;
+    margin: 24px 0 28px;
+    border: 1px solid #c4b5fd;
+    border-radius: 17px;
+    background:
+      linear-gradient(
+        135deg,
+        #f5f3ff,
+        #eff6ff
+      );
+    text-align: center;
+  }
+
+  .score {
+    color: var(--primary-dark);
+    font-size: clamp(2.2rem, 6vw, 3.3rem);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+  }
+
+  #percentageText {
+    color: #475569;
+    font-weight: 650;
+  }
+
+  #resultMessage {
+    color: #312e81;
+    font-weight: 750;
+  }
+
+  .result-item {
+    padding: 17px 19px;
+    margin: 14px 0;
+    border-left: 5px solid var(--border);
+    border-radius: 11px;
+    background: var(--card-soft);
+    line-height: 1.6;
+  }
+
+  .result-item.correct {
+    border-left-color: var(--success);
+    background: #f0fdf4;
+  }
+
+  .result-item.incorrect {
+    border-left-color: var(--danger);
+    background: #fef2f2;
+  }
+
+  .result-item.open {
+    border-left-color: var(--warning);
+    background: #fffbeb;
+  }
+
+  .result-item strong {
+    display: block;
+    margin-bottom: 9px;
+    color: #1e293b;
+  }
+
+  .small-note {
+    color: var(--muted);
+    font-size: 0.93rem;
+  }
+
+  @media (max-width: 700px) {
+    .app {
+      width: 96%;
+      padding-top: 15px;
+    }
+
+    header {
+      padding: 25px 18px;
+      border-radius: 19px;
+    }
+
+    .start-card,
+    .result-card {
+      padding: 23px;
+    }
+
+    .progress-info,
+    .progress-track,
+    .timer-area,
+    .unlimited,
+    .question-number,
+    .question-text,
+    .answer-list,
+    .button-row {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+
+    .progress-info {
+      padding-top: 22px;
+      font-size: 0.82rem;
+    }
+
+    .question-text {
+      font-size: 1.1rem;
+    }
+
+    .button-row {
+      flex-direction: column-reverse;
+      padding-bottom: 23px;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+</style>
+
+</head>
+
+<body>
+  <main class="app">
+
+    <!-- Startseite -->
+    <section id="startScreen" class="card start-card">
+      <h2>Hinweise zur Übung</h2>
+
+      <ul>
+        <li>Die Fragen müssen (bis auf die letzte) jeweils innerhalb von 45 Sekunden beantwortet werden.</li>
+        <li>Bei einigen Fragen sind mehrere Antworten richtig.</li>
+        <li>Die letzte Frage ist eine offene Transferaufgabe ohne Zeitbegrenzung.</li>
+        <li>Insgesamt können 12 Punkte erreicht werden.</li>
+      </ul>
+
+      <button id="startButton">Übung starten</button>
+    </section>
+
+    <!-- Übung -->
+<section id="quizScreen" class="card quiz-card hidden">
+
+      <div class="progress-info">
+        <span id="questionCounter">Frage 1 von 10</span>
+        <span id="answeredCounter">Beantwortet: 0</span>
+      </div>
+
+      <div class="progress-track">
+        <div id="progressBar"></div>
+      </div>
+
+      <!-- Zeitbalken -->
+      <div id="timerArea" class="timer-area">
+        <div class="timer-label">
+          <span>Verbleibende Zeit</span>
+          <span id="timeText">45 Sekunden</span>
+        </div>
+
+        <div class="timer-track">
+          <div id="timerBar"></div>
+        </div>
+      </div>
+
+      <!-- Für die letzte Frage -->
+<!-- Für die letzte Frage -->
+<div id="unlimitedArea" class="unlimited hidden">
+Diese Aufgabe ist ohne Zeitbegrenzung.
+</div>
+
+<p id="questionText" class="question-text"></p>
+<div id="answerList" class="answer-list"></div>
+
+      <div class="button-row">
+        <button id="backButton" class="secondary">Zurück</button>
+        <button id="nextButton">Weiter</button>
+      </div>
+    </section>
+
+    <!-- Auswertung -->
+    <section id="resultScreen" class="card hidden">
+
+      <div class="result-summary">
+        <div id="scoreText" class="score"></div>
+        <p id="percentageText"></p>
+        <p id="resultMessage"></p>
+      </div>
+
+      <div id="resultDetails"></div>
+
+      <div class="button-row">
+        <button id="restartButton">Übung wiederholen</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const questions = [
+      
+      {
+        type: "multiple",
+        question:
+          "Welche Aussagen zum verfassungsrechtlichen Rahmen des Sozialstaats treffen zu?",
+        options: [
+          "Das Sozialstaatsprinzip ergibt sich unter anderem aus Art. 20 GG.",
+
+          "Die Menschenwürde setzt dem Gesetzgeber Grenzen und verpflichtet ihn insbesondere zum Ausgleich der Einkommenshöhe.",
+
+          "Der Sozialstaat gehört nach Art. 79 Abs. 3 GG zum grundsätzlich unantastbaren Verfassungskern.",
+
+          "Der Gesetzgeber darf sozialpolitische Regelungen vollständig unabhängig vom Grundgesetz beschließen.",
+
+          "Das Grundgesetz legt nur die wichtigsten Sozialleistungen detailliert fest."
+        ],
+        correct: [0, 2],
+        points: 1
+      },
+
+      {
+        type: "multiple",
+        question:
+          "Welche Zuordnungen der Prinzipien des Sozialgesetzbuches sind korrekt?",
+        options: [
+          "Solidarprinzip: Mitglieder einer Gemeinschaft stehen füreinander ein.",
+
+          "Versicherungsprinzip: Wer Beiträge zahlt, erwirbt grundsätzlich Ansprüche auf Leistungen.",
+
+          "Bedarfsprinzip: Die Leistung richtet sich nach dem individuellen Bedarf.",
+
+          "Subsidiaritätsprinzip: Der Staat hilft grundsätzlich zuerst, bevor eine Person eigene Möglichkeiten nutzen muss.",
+
+          "Partizipations: JEDE Person erhält Leistungen in Höhe der eingezahlten Beiträge."
+        ],
+        correct: [0, 1, 2],
+        points: 1
+      },
+
+      {
+        type: "single",
+        question:
+          "Welche Formel beschreibt die Sozialleistungsquote korrekt?",
+        options: [
+          "(Sozialbudget : Staatsausgaben) × 100",
+
+          "(Sozialausgaben : Bruttoinlandsprodukt) × 100",
+
+          "(Bruttoinlandsprodukt : Sozialausgaben) × 100",
+
+          "(Sozialausgaben − Sozialversicherungsbeiträge) × 100"
+        ],
+        correct: [1],
+        points: 1
+      },
+
+      {
+        type: "multiple",
+        question:
+          "Warum können nominale Sozialausgaben bei langfristigen Vergleichen einen irreführenden Eindruck erzeugen?",
+        options: [
+          "Nominale Werte berücksichtigen Preissteigerungen nicht.",
+
+          "Nominale Werte sind grundsätzlich immer falsch und dürfen nicht verwendet werden.",
+
+          "Nominale Zahlen enthalten grundsätzlich keine Ausgaben für Renten.",
+
+          "Ein Anstieg der absoluten Ausgaben zeigt nicht automatisch, dass der Anteil der Sozialausgaben an der Wirtschaftsleistung gestiegen ist."
+        ],
+        correct: [0, 3],
+        points: 1
+      },
+
+      {
+        type: "single",
+        question:
+          "Wie erklärt Stefan Sell den deutlichen Anstieg der Sozialleistungsquote im Jahr 2020?",
+        options: [
+          "Durch eine dauerhafte Kürzung der Rentenleistungen.",
+
+          "Steigende Sozialausgaben und bei gleichzeitigem Einbruch des BIP durch Corona.",
+
+          "Durch die erstmalige Einbeziehung der privaten Krankenversicherung im Jahr 2020.",
+
+          "Durch ein besonders starkes Wirtschaftswachstum bei unveränderten Sozialausgaben."
+        ],
+        correct: [1],
+        points: 1
+      },
+
+      {
+        type: "multiple",
+        question:
+          "Welche Aussagen entsprechen der Argumentation von Stefan Sell?",
+        options: [
+          "Die nominalen Sozialausgaben sind stark gestiegen, daraus folgt aber nicht automatisch, dass der Sozialstaat außer Kontrolle gerät.",
+
+          "Die Sozialleistungsquote ist für die Einordnung aussagekräftiger als die isolierte absolute Ausgabensumme.",
+
+          "Die relative Stabilität der Quote in den 2010er-Jahren ist angesichts steigender Herausforderungen erklärungsbedürftig.",
+
+          "Der Anstieg 2024 und 2025 steht unter anderem im Zusammenhang mit steigenden Gesundheits- und Pflegeausgaben sowie schwacher Wirtschaftsentwicklung."
+        ],
+        correct: [0, 1, 2, 3],
+        points: 1
+      },
+
+      {
+        type: "multiple",
+        question:
+          "Welche statistischen Angaben sind korrekt?",
+        options: [
+          "Deutschland verwendet rund 41 Prozent seiner Staatsausgaben für soziale Sicherung.",
+
+          "Etwa die Hälfte der Mittel für soziale Sicherung entfällt in Deutschland auf die Alterssicherung.",
+
+          "Gemessen an der Wirtschaftsleistung liegen die skandinavischen Länder bei den Sozialausgaben knapp vor Deutschland.",
+
+          "Etwa ein Drittel des Bruttoinlandsprodukts wird für Soziales ausgegeben."
+        ],
+        correct: [0, 1, 2, 3],
+        points: 1
+      },
+
+      {
+        type: "single",
+        question:
+          "Welche Aussage beschreibt die Rolle des Bundesverfassungsgerichts im deutschen Sozialstaat am treffendsten?",
+        options: [
+          "Das Bundesverfassungsgericht legt die Höhe der Sozialleistungen fest.",
+
+          "Das Bundesverfassungsgericht konkretisiert lediglich verfassungsrechtliche Vorgaben.",
+
+          "Das Bundesverfassungsgericht darf sozialpolitische Gesetze grundsätzlich nicht überprüfen.",
+
+          "Das Bundesverfassungsgericht überwacht, dass die Sozialversicherungen tatsächlich nach dem Bedarfsprinzip vergeben werden."
+        ],
+        correct: [1],
+        points: 1
+      },
+
+      {
+        type: "text",
+        question:
+          "Beurteile folgende Aussage:\n\n„Die Sozialausgaben von 1.431 Milliarden Euro im Jahr 2025 beweisen, dass der deutsche Sozialstaat finanziell außer Kontrolle geraten ist.“\n\nNimm begründet Stellung.",
+        correct: [],
+        points: 4
+      }
+    ];
+
+    const TIMED_QUESTIONS = 8;
+    const MAX_TIME_SECONDS = 45;
+    const TIMER_INTERVAL = 50;
+
+    let currentQuestion = 0;
+    let answers = [];
+    let timer = null;
+    let remainingMilliseconds = MAX_TIME_SECONDS * 1000;
+
+    const startScreen = document.getElementById("startScreen");
+    const quizScreen = document.getElementById("quizScreen");
+    const resultScreen = document.getElementById("resultScreen");
+
+    const startButton = document.getElementById("startButton");
+    const backButton = document.getElementById("backButton");
+    const nextButton = document.getElementById("nextButton");
+    const restartButton = document.getElementById("restartButton");
+
+    const questionCounter = document.getElementById("questionCounter");
+    const answeredCounter = document.getElementById("answeredCounter");
+    const progressBar = document.getElementById("progressBar");
+
+    const timerArea = document.getElementById("timerArea");
+    const unlimitedArea = document.getElementById("unlimitedArea");
+    const timerBar = document.getElementById("timerBar");
+    const timeText = document.getElementById("timeText");
+
+    const questionText = document.getElementById("questionText");
+    const answerList = document.getElementById("answerList");
+
+    startButton.addEventListener("click", startQuiz);
+    nextButton.addEventListener("click", nextQuestion);
+    backButton.addEventListener("click", previousQuestion);
+    restartButton.addEventListener("click", restartQuiz);
+
+    function startQuiz() {
+      currentQuestion = 0;
+      answers = Array(questions.length).fill(null);
+
+      startScreen.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+
+      showQuestion();
+    }
+
+    function showQuestion() {
+      stopTimer();
+
+      const question = questions[currentQuestion];
+      const isLastQuestion = currentQuestion >= TIMED_QUESTIONS;
+
+      questionCounter.textContent =
+        `Frage ${currentQuestion + 1} von ${questions.length}`;
+
+      questionText.textContent = question.question;
+
+      progressBar.style.width =
+        `${((currentQuestion + 1) / questions.length) * 100}%`;
+
+      answerList.innerHTML = "";
+
+      if (isLastQuestion) {
+        timerArea.classList.add("hidden");
+        unlimitedArea.classList.remove("hidden");
+      } else {
+        timerArea.classList.remove("hidden");
+        unlimitedArea.classList.add("hidden");
+      }
+
+      if (question.type === "text") {
+        createTextAnswer();
+      } else {
+        createChoiceAnswers(question);
+      }
+
+      backButton.disabled = currentQuestion === 0;
+
+      nextButton.textContent = isLastQuestion
+        ? "Auswertung anzeigen"
+        : "Weiter";
+
+      updateAnsweredCounter();
+
+      if (!isLastQuestion) {
+        startTimer();
+      }
+    }
+
+    function createChoiceAnswers(question) {
+      question.options.forEach((option, index) => {
+        const label = document.createElement("label");
+        label.className = "answer-option";
+
+        const input = document.createElement("input");
+
+        input.type = question.type === "multiple"
+          ? "checkbox"
+          : "radio";
+
+        input.name = "answer";
+        input.value = index;
+
+        const savedAnswer = answers[currentQuestion] || [];
+
+        if (savedAnswer.includes(index)) {
+          input.checked = true;
+          label.classList.add("selected");
+        }
+
+        input.addEventListener("change", () => {
+          if (question.type === "multiple") {
+            answers[currentQuestion] = [
+              ...document.querySelectorAll(
+                'input[name="answer"]:checked'
+              )
+            ].map(element => Number(element.value));
+          } else {
+            answers[currentQuestion] = [Number(input.value)];
+          }
+
+          document
+            .querySelectorAll(".answer-option")
+            .forEach(optionLabel => {
+              optionLabel.classList.remove("selected");
+            });
+
+          document
+            .querySelectorAll('input[name="answer"]:checked')
+            .forEach(checkedInput => {
+              checkedInput
+                .closest(".answer-option")
+                .classList.add("selected");
+            });
+
+          updateAnsweredCounter();
+        });
+
+        const span = document.createElement("span");
+        span.textContent = option;
+
+        label.appendChild(input);
+        label.appendChild(span);
+
+        answerList.appendChild(label);
+      });
+    }
+
+    function createTextAnswer() {
+      const textarea = document.createElement("textarea");
+
+      textarea.id = "textAnswer";
+      textarea.placeholder =
+        "Formuliere eine begründete Bewertung der Aussage ...";
+
+      if (typeof answers[currentQuestion] === "string") {
+        textarea.value = answers[currentQuestion];
+      }
+
+      textarea.addEventListener("input", () => {
+        answers[currentQuestion] = textarea.value;
+        updateAnsweredCounter();
+      });
+
+      answerList.appendChild(textarea);
+    }
+
+    function startTimer() {
+      remainingMilliseconds = MAX_TIME_SECONDS * 1000;
+      updateTimerDisplay();
+
+      timer = setInterval(() => {
+        remainingMilliseconds -= TIMER_INTERVAL;
+
+        if (remainingMilliseconds <= 0) {
+          remainingMilliseconds = 0;
+          updateTimerDisplay();
+          stopTimer();
+
+          // Bei Zeitablauf automatisch zur nächsten Frage
+          nextQuestion();
+          return;
+        }
+
+        updateTimerDisplay();
+      }, TIMER_INTERVAL);
+    }
+
+    function stopTimer() {
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const percentage =
+        remainingMilliseconds / (MAX_TIME_SECONDS * 1000) * 100;
+
+      timerBar.style.width = `${percentage}%`;
+
+      const seconds = Math.ceil(remainingMilliseconds / 1000);
+
+      timeText.textContent =
+        `${seconds} ${seconds === 1 ? "Sekunde" : "Sekunden"}`;
+
+      timerBar.classList.remove("warning", "danger");
+
+      if (remainingMilliseconds <= 10000) {
+        timerBar.classList.add("danger");
+      } else if (remainingMilliseconds <= 20000) {
+        timerBar.classList.add("warning");
+      }
+    }
+
+    function saveCurrentAnswer() {
+      const textarea = document.getElementById("textAnswer");
+
+      if (textarea) {
+        answers[currentQuestion] = textarea.value;
+      }
+    }
+
+    function nextQuestion() {
+      saveCurrentAnswer();
+      stopTimer();
+
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        showQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function previousQuestion() {
+      saveCurrentAnswer();
+      stopTimer();
+
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        showQuestion();
+      }
+    }
+
+    function updateAnsweredCounter() {
+      const answered = answers.filter(answer => {
+        if (Array.isArray(answer)) {
+          return answer.length > 0;
+        }
+
+        return typeof answer === "string" &&
+          answer.trim().length > 0;
+      }).length;
+
+      answeredCounter.textContent =
+        `Beantwortet: ${answered}`;
+    }
+
+    function arraysEqual(firstArray, secondArray) {
+      if (!Array.isArray(firstArray) ||
+          !Array.isArray(secondArray)) {
+        return false;
+      }
+
+      if (firstArray.length !== secondArray.length) {
+        return false;
+      }
+
+      const first = [...firstArray].sort((a, b) => a - b);
+      const second = [...secondArray].sort((a, b) => a - b);
+
+      return first.every((value, index) => {
+        return value === second[index];
+      });
+    }
+
+    function evaluateOpenAnswer(answer) {
+      if (!answer || !answer.trim()) {
+        return {
+          points: 0,
+          maxPoints: 4,
+          status: "incorrect",
+          feedback: "Keine Antwort abgegeben."
+        };
+      }
+
+      const text = answer.toLowerCase();
+
+      let points = 0;
+      const criteria = [];
+
+      const mentionsNominalOrReal =
+        text.includes("nominal") ||
+        text.includes("real") ||
+        text.includes("preis") ||
+        text.includes("inflation") ||
+        text.includes("preisbereinigt");
+
+      const mentionsQuotaOrBip =
+        text.includes("sozialleistungsquote") ||
+        text.includes("quote") ||
+        text.includes("bip") ||
+        text.includes("bruttoinlandsprodukt") ||
+        text.includes("wirtschaftsleistung");
+
+      const mentions2010s =
+        text.includes("2010er") ||
+        text.includes("2010") ||
+        text.includes("konstant") ||
+        text.includes("stabil");
+
+      const mentionsCorona =
+        text.includes("corona") ||
+        text.includes("2020") ||
+        text.includes("pandemie") ||
+        text.includes("einbruch");
+
+      const mentions2024or2025 =
+        text.includes("2024") ||
+        text.includes("2025") ||
+        text.includes("gesundheit") ||
+        text.includes("pflege") ||
+        text.includes("stagnation") ||
+        text.includes("rezession");
+
+      const givesBalancedJudgement =
+        text.includes("nicht automatisch") ||
+        text.includes("beweist nicht") ||
+        text.includes("aussagekraft") ||
+        text.includes("differenziert") ||
+        text.includes("einzuordnen") ||
+        text.includes("kommt darauf an");
+
+      if (mentionsNominalOrReal) {
+        points++;
+        criteria.push("nominale bzw. reale Größen");
+      }
+
+      if (mentionsQuotaOrBip) {
+        points++;
+        criteria.push("Sozialleistungsquote und BIP");
+      }
+
+      if (mentions2010s || mentionsCorona) {
+        points++;
+        criteria.push("zeitliche Entwicklung bzw. Corona-Sondereffekt");
+      }
+
+      if (mentions2024or2025 || givesBalancedJudgement) {
+        points++;
+        criteria.push("jüngste Entwicklung und differenzierte Bewertung");
+      }
+
+      return {
+        points,
+        maxPoints: 4,
+        status: points >= 3 ? "correct" : "open",
+        feedback: points >= 3
+          ? "Die Antwort berücksichtigt mehrere zentrale Aspekte der Materialien."
+          : "Die Antwort sollte absolute und relative Zahlen sowie die zeitliche Entwicklung stärker miteinander verknüpfen."
+      };
+    }
+
+    function showResults() {
+      stopTimer();
+
+      quizScreen.classList.add("hidden");
+      resultScreen.classList.remove("hidden");
+
+      let score = 0;
+      let maxScore = 0;
+      let details = "";
+
+      questions.forEach((question, index) => {
+        const answer = answers[index];
+
+        if (question.type === "text") {
+          const evaluation = evaluateOpenAnswer(answer);
+
+          score += evaluation.points;
+          maxScore += evaluation.maxPoints;
+
+          details += `
+            <div class="result-item ${evaluation.status}">
+              <strong>
+                Frage ${index + 1}: ${evaluation.points}/${evaluation.maxPoints} Punkte
+              </strong>
+
+              <div>
+                <b>Deine Antwort:</b><br>
+                ${
+                  answer && answer.trim()
+                    ? escapeHtml(answer)
+                    : "Keine Antwort"
+                }
+              </div>
+
+              <p class="small-note">
+                ${evaluation.feedback}
+              </p>
+            </div>
+          `;
+
+          return;
+        }
+
+        maxScore += question.points;
+
+        const isCorrect = arraysEqual(
+          answer || [],
+          question.correct
+        );
+
+        if (isCorrect) {
+          score += question.points;
+        }
+
+        const givenAnswer = answer && answer.length
+          ? answer
+              .map(number => question.options[number])
+              .join(" | ")
+          : "Keine Antwort";
+
+        const correctAnswer = question.correct
+          .map(number => question.options[number])
+          .join(" | ");
+
+        details += `
+          <div class="result-item ${
+            isCorrect ? "correct" : "incorrect"
+          }">
+            <strong>
+              Frage ${index + 1}:
+              ${isCorrect ? "Richtig" : "Falsch"}
+            </strong>
+
+            <div>
+              <b>Deine Antwort:</b><br>
+              ${escapeHtml(givenAnswer)}
+            </div>
+
+            <div>
+              <b>Richtige Antwort:</b><br>
+              ${escapeHtml(correctAnswer)}
+            </div>
+          </div>
+        `;
+      });
+
+      const percentage = Math.round((score / maxScore) * 100);
+
+      document.getElementById("scoreText").textContent =
+        `${score} von ${maxScore} Punkten`;
+
+      document.getElementById("percentageText").textContent =
+        `Das entspricht ${percentage} %.`;
+
+      let message;
+
+      if (percentage >= 90) {
+        message = "Hervorragende Leistung! Du kannst die Materialien sehr sicher einordnen.";
+      } else if (percentage >= 75) {
+        message = "Sehr gute Leistung. Die zentralen Zusammenhänge wurden weitgehend verstanden.";
+      } else if (percentage >= 60) {
+        message = "Solide Leistung. Einzelne Begriffe und Argumentationsschritte solltest du noch wiederholen.";
+      } else if (percentage >= 50) {
+        message = "Das Grundverständnis ist vorhanden, aber einige Inhalte müssen noch vertieft werden.";
+      } else {
+        message = "Die Materialien sollten noch einmal systematisch wiederholt werden.";
+      }
+
+      document.getElementById("resultMessage").textContent = message;
+      document.getElementById("resultDetails").innerHTML = details;
+    }
+
+    function restartQuiz() {
+      stopTimer();
+
+      currentQuestion = 0;
+      answers = [];
+
+      resultScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
