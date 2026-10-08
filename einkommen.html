@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Einkommensteuer-Simulator</title>
+<title>Einkommensteuer-Simulator - ZK Q2 HW</title>
 <style>
 :root {
   --bg:#f5f7fa; --panel:#ffffff; --border:#dde3ed;
@@ -74,8 +74,8 @@ button.reform:hover{background:#136638;border-color:#136638;}
 </head>
 <body>
 <header>
-  <h1>Einkommensteuer-Simulator</h1>
-  <span>Tarifvergleich · Quelle: <a href="https://www.destatis.de/DE/Themen/Staat/Steuern/LohnsteuerEinkommensteuer/Tabellen/gde.html" target="_blank">Destatis Einkommensteuer-Statistik 2022</a></span>
+  <h1>ZK Q2 – Einkommensteuer-Simulator</h1>
+  <span>Datengrundlage: <a href="https://www.destatis.de/DE/Themen/Staat/Steuern/LohnsteuerEinkommensteuer/Tabellen/gde.html" target="_blank">Destatis Einkommensteuer-Statistik 2022</a></span>
 </header>
 <div id="main">
   <div id="canvas-col">
@@ -262,7 +262,7 @@ const canvas = document.getElementById('chart');
 const ctx    = canvas.getContext('2d');
 const X_MIN  = 1000;
 const X_MAX  = 300000;
-const Y_MAX  = 0.60;
+const Y_MAX  = 0.5;
 let W = 0, H = 0;
 let PAD = {top:28, right:20, bottom:52, left:56};
 
@@ -559,8 +559,6 @@ function draw() {
     ctx.restore();
   })();
 
-
-
   // X-Gitterlinien + Labels
   const xTicks = [1000, 10000, 50000, 100000, 200000, 300000];
   xTicks.forEach(v => {
@@ -582,7 +580,7 @@ function draw() {
   ctx.font       = '11px -apple-system,sans-serif';
   ctx.textAlign  = 'center';
   ctx.fillText('Zu versteuerndes Einkommen (lineare Skala)',
-               PAD.left + cW / 2, H - 4);
+               PAD.left + cW / 2, H - 15);
 
   // Zonentrennlinien
   function zLine(inc, lbl, color) {
@@ -662,7 +660,7 @@ canvas.addEventListener('mousemove', e => {
 canvas.addEventListener('mouseleave', () => {
   mX = -1;
   draw();
-  document.getElementById('tip').innerHTML = 'Bewege die Maus über den Chart für Detailwerte.';
+  document.getElementById('tip').innerHTML = 'Bewege die Maus über das Diagramm für Detailwerte.';
 });
 
 function drawCrosshair() {
@@ -735,7 +733,6 @@ function drawCrosshair() {
     `EST: <strong>${f(tax)} €</strong> &nbsp;|&nbsp; ` +
     `Soli: ${f(soli)} € &nbsp;|&nbsp; ` +
     `Netto: <strong>${f(net)} €</strong> &nbsp;|&nbsp; ` +
-    diffStr + ` &nbsp;|&nbsp; ` +
     `Gruppe ${grpFrom}–${grpTo} €: ${grpN} Personen`;
 }
 
@@ -798,8 +795,8 @@ function applyP(src) {
 function resize() {
   const col  = document.getElementById('canvas-col');
   const rect = col.getBoundingClientRect();
-  W = Math.floor(rect.width - 28);
-  H = Math.floor(Math.max(320, Math.min(540, W * 0.6)));
+  W = Math.floor(rect.width - 10);
+  H = Math.floor(Math.max(320, Math.min(540, W * 0.8)));
   canvas.width  = W;
   canvas.height = H;
   draw();
@@ -828,4 +825,3 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
-
