@@ -170,14 +170,13 @@ button.reform:hover{background:#136638;border-color:#136638;}
       <div class="sc"><div class="lbl">Ø Steuersatz</div><div class="val" id="st_avg">–</div></div>
       <div class="sc"><div class="lbl">Soli (Mrd. €)</div><div class="val" id="st_soli">–</div></div>
       <div class="sc"><div class="lbl">Steuerpflichtige</div><div class="val" id="st_n">–</div></div>
-      <!-- NEU: Δ zur Referenz 365.1 Mrd. klar hervorgehoben -->
+      <!-- NEU: Unterschied zur Referenz 365.1 Mrd. klar hervorgehoben -->
       <div class="sc delta-box" style="grid-column:1/-1;">
-        <div class="lbl">⚡ Δ zur Referenz 2025/26 (365.1 Mrd. €)</div>
+        <div class="lbl">Unterschied zur Referenz 2025/26 (grob geschätzt)</div>
         <div class="val" id="st_delta">–</div>
         <div id="st_delta_detail" style="font-size:0.67rem;color:#5a6a80;margin-top:2px;"></div>
       </div>
-      <div class="sc"><div class="lbl">Ref. 2025/26 (Mrd. €)</div><div class="val" id="st_ref">365.1</div></div>
-      <div class="sc"><div class="lbl">Ref. 2022 (Mrd. €)</div><div class="val" id="st_ref22">–</div></div>
+      
     </div>
 
     <div class="sec">Modellannahmen</div>
@@ -460,7 +459,6 @@ function updateStats() {
   document.getElementById('st_avg' ).textContent = (cur.avg * 100).toFixed(1) + ' %';
   document.getElementById('st_soli').textContent = cur.soli.toFixed(1) + ' Mrd.';
   document.getElementById('st_n'   ).textContent = cur.n.toFixed(2)    + ' Mio.';
-  document.getElementById('st_ref22').textContent = rev22.tax.toFixed(1) + ' Mrd.';
 
   // ── Delta zur 340-Mrd.-Referenz ──────────────────────────────────────────
   const dEl   = document.getElementById('st_delta');
@@ -825,3 +823,6 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
+
+
