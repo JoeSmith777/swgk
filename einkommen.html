@@ -603,24 +603,6 @@ function draw() {
   zLine(P.rth,   '"Reichensteuer"');
   if (P.rth2 < X_MAX * 0.95) zLine(P.rth2, '"Reichenst." 2', 'rgba(150,0,0,0.45)');
 
-  // Referenzlinie 340 Mrd. im Chart: horizontale Hilfslinie bei rev26-Ø-Steuersatz
-  // (visueller Anker – zeigt wo die Referenzkurve liegt)
-  function drawCurve(paramObj, getY, color, width, dash) {
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth   = width;
-    ctx.setLineDash(dash || []);
-    let first = true;
-    for (let px = PAD.left; px <= W - PAD.right; px += 1.5) {
-      const inc = xToIncome(px);
-      const y   = yPct(getY(inc, paramObj));
-      if (first) { ctx.moveTo(px, y); first = false; }
-      else ctx.lineTo(px, y);
-    }
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
   // Referenzkurve 2025/26 (gestrichelt grau)
   drawCurve(STD26,
     (inc, p) => marginal(inc, p),
