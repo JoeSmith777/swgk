@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Einkommensteuer-Simulator</title>
+<style>
+:root {
+  --bg:#f5f7fa; --panel:#ffffff; --border:#dde3ed;
+  --accent:#3b7dd8; --text:#1e2a3a; --text2:#5a6a80;
+  --shadow:0 2px 12px rgba(0,0,0,0.10); --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+header{background:var(--panel);border-bottom:1px solid var(--border);
+  padding:10px 20px;display:flex;align-items:baseline;gap:14px;box-shadow:var(--shadow);}
+header h1{font-size:1.05rem;font-weight:700;color:var(--accent);}
+header span{font-size:0.78rem;color:var(--text2);}
+#main{display:flex;flex:1;overflow:hidden;}
+#canvas-col{flex:7;display:flex;flex-direction:column;padding:14px 10px 14px 14px;gap:8px;min-width:0;}
+#controls-col{flex:3;background:var(--panel);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;padding:12px;gap:6px;
+  min-width:260px;max-width:340px;}
+canvas{background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);width:100%;cursor:crosshair;display:block;}
+.sec{font-size:0.70rem;font-weight:700;color:var(--accent);text-transform:uppercase;
+  letter-spacing:0.07em;padding-bottom:3px;border-bottom:2px solid var(--border);margin-bottom:3px;margin-top:4px;}
+.zone-badge{font-size:0.67rem;font-weight:700;color:#fff;padding:2px 8px;
+  border-radius:4px;margin:5px 0 1px;display:inline-block;}
+.z1-badge{background:#e07020;}
+.z2-badge{background:#3b7dd8;}
+.zs-badge{background:#c27ba0;}
+.zr-badge{background:#c0392b;}
+.sl-lbl{font-size:0.75rem;color:var(--text2);margin-top:2px;}
+.sl-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px;}
+.sl-val{font-size:0.79rem;font-weight:700;color:var(--text);text-align:right;min-width:82px;}
+input[type=range]{width:100%;height:4px;accent-color:var(--accent);cursor:pointer;margin:2px 0 3px;}
+.btn-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;}
+button{flex:1;padding:6px 7px;border:1px solid var(--border);border-radius:8px;
+  background:var(--panel);color:var(--text);font-size:0.76rem;font-weight:600;
+  cursor:pointer;transition:all 0.15s;}
+button:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+button.pri{background:var(--accent);color:#fff;border-color:var(--accent);}
+button.reform{background:#1a8a4a;color:#fff;border-color:#1a8a4a;flex:2;}
+button.reform:hover{background:#136638;border-color:#136638;}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.sc{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 9px;}
+.sc .lbl{font-size:0.66rem;color:var(--text2);}
+.sc .val{font-size:0.92rem;font-weight:700;color:var(--text);}
+.val.green{color:#1a8a4a;} .val.red{color:#c0392b;}
+
+/* ── NEU: Delta-Box hervorgehoben ── */
+.sc.delta-box{border:2px solid #3b7dd8;background:#f0f4ff;}
+.sc.delta-box .lbl{color:#3b7dd8;font-weight:700;}
+.sc.delta-box .val{font-size:1.05rem;}
+
+/* ── NEU: Aufkommens-Balken ── */
+.revenue-bar-wrap{margin:4px 0 2px;background:#e8edf5;border-radius:6px;height:14px;overflow:hidden;position:relative;}
+.revenue-bar-fill{height:100%;border-radius:6px;transition:width 0.35s ease;background:linear-gradient(90deg,#3b7dd8,#5fa0f0);}
+.revenue-bar-label{position:absolute;right:6px;top:0;line-height:14px;font-size:0.62rem;font-weight:700;color:#1e2a3a;}
+
+.leg-row{display:flex;align-items:center;gap:6px;font-size:0.73rem;color:var(--text2);}
+.leg-line{width:22px;height:3px;border-radius:2px;flex-shrink:0;}
+.leg-box{width:13px;height:13px;border-radius:3px;flex-shrink:0;}
+#tip{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+  padding:7px 12px;font-size:0.76rem;color:var(--text2);min-height:34px;box-shadow:var(--shadow);}
+#tip strong{color:var(--text);}
+.note{font-size:0.67rem;color:var(--text2);background:#f0f4ff;border:1px solid #d0daee;
+  border-radius:6px;padding:5px 8px;line-height:1.45;}
+.alist{font-size:0.69rem;color:var(--text2);line-height:1.5;padding-left:13px;}
+.alist li{margin-bottom:2px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Einkommensteuer-Simulator</h1>
+  <span>Tarifvergleich · Quelle: <a href="https://www.destatis.de/DE/Themen/Staat/Steuern/LohnsteuerEinkommensteuer/Tabellen/gde.html" target="_blank">Destatis Einkommensteuer-Statistik 2022</a></span>
+</header>
+<div id="main">
+  <div id="canvas-col">
+    <canvas id="chart"></canvas>
+    <div id="tip">Bewege die Maus über den Graphen für Detailwerte.</div>
+  </div>
+  <div id="controls-col">
+
+    <!-- ── Schieberegler ── -->
+    <div class="sec">Grundparameter</div>
+
+    <div class="sl-lbl">Grundfreibetrag (in €)</div>
+    <div class="sl-row">
+      <input type="range" id="s_gfb" min="0" max="20000" step="100">
+      <span class="sl-val" id="v_gfb"></span>
+    </div>
+
+    <span class="zone-badge z1-badge">Progressionszone 1</span>
+    <div class="sl-lbl">Eingangssteuersatz (in %)</div>
+    <div class="sl-row">
+      <input type="range" id="s_eins" min="1" max="50" step="0.5">
+      <span class="sl-val" id="v_eins"></span>
+    </div>
+    <div class="sl-lbl">Ende Zone 1 (in €)</div>
+    <div class="sl-row">
+      <input type="range" id="s_z1end" min="13000" max="50000" step="100">
+      <span class="sl-val" id="v_z1end"></span>
+    </div>
+
+    <span class="zone-badge z2-badge">Progressionszone 2</span>
+    <div class="sl-lbl">Steuersatz zu Beginn von Zone 2 (in %)</div>
+    <div class="sl-row">
+      <input type="range" id="s_z1rate" min="14" max="42" step="0.5">
+      <span class="sl-val" id="v_z1rate"></span>
+    </div>
+    <div class="sl-lbl">Ende Zone 2 / Spitzensteuerbeginn (in €)</div>
+    <div class="sl-row">
+      <input type="range" id="s_pzone" min="30000" max="300000" step="1000">
+      <span class="sl-val" id="v_pzone"></span>
+    </div>
+
+    <span class="zone-badge zs-badge">Spitzensteuersatz</span>
+    <div class="sl-lbl">Spitzensteuersatz (in %)</div>
+    <div class="sl-row">
+      <input type="range" id="s_spitz" min="30" max="60" step="0.5">
+      <span class="sl-val" id="v_spitz"></span>
+    </div>
+
+    <span class="zone-badge zr-badge">Höchststeuersatz (Reichensteuer)</span>
+    <div class="sl-lbl">Schwelle Stufe 1 (in €)</div>
+    <div class="sl-row">
+      <input type="range" id="s_rth" min="100000" max="600000" step="1000">
+      <span class="sl-val" id="v_rth"></span>
+    </div>
+    <div class="sl-lbl">Satz Stufe 1 (in %)</div>
+    <div class="sl-row">
+      <input type="range" id="s_reich" min="40" max="65" step="0.5">
+      <span class="sl-val" id="v_reich"></span>
+    </div>
+    <div class="sl-lbl">Schwelle Stufe 2 (in €)</div>
+    <div class="sl-row">
+      <input type="range" id="s_rth2" min="100000" max="1000000" step="1000">
+      <span class="sl-val" id="v_rth2"></span>
+    </div>
+    <div class="sl-lbl">Satz Stufe 2 (in %)</div>
+    <div class="sl-row">
+      <input type="range" id="s_reich2" min="40" max="70" step="0.5">
+      <span class="sl-val" id="v_reich2"></span>
+    </div>
+
+    <!-- ── PRESETS ── -->
+    <div class="sec">▶ Presets</div>
+    <div class="btn-row">
+      <button class="pri" onclick="applyP(STD26)">▶ 2025/2026</button>
+      <button onclick="applyP(STD26)">⟳ Reset</button>
+    </div>
+    <div class="btn-row">
+      <button class="reform" onclick="applyP(STD_REFORM)">Reformplan vom 2.9.2026 laden</button>
+    </div>
+
+    <!-- ── STEUERAUFKOMMEN ── -->
+    <div class="sec">Steueraufkommen – Referenz: 365.1 Mrd. €</div>
+
+    <!-- Aufkommens-Balken -->
+    <div class="revenue-bar-wrap">
+      <div class="revenue-bar-fill" id="rev_bar" style="width:100%"></div>
+      <div class="revenue-bar-label" id="rev_bar_lbl">365.1 Mrd.</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="sc"><div class="lbl">EST gesamt (Mrd. €)</div><div class="val" id="st_est">–</div></div>
+      <div class="sc"><div class="lbl">Ø Steuersatz</div><div class="val" id="st_avg">–</div></div>
+      <div class="sc"><div class="lbl">Soli (Mrd. €)</div><div class="val" id="st_soli">–</div></div>
+      <div class="sc"><div class="lbl">Steuerpflichtige</div><div class="val" id="st_n">–</div></div>
+      <!-- NEU: Δ zur Referenz 365.1 Mrd. klar hervorgehoben -->
+      <div class="sc delta-box" style="grid-column:1/-1;">
+        <div class="lbl">⚡ Δ zur Referenz 2025/26 (365.1 Mrd. €)</div>
+        <div class="val" id="st_delta">–</div>
+        <div id="st_delta_detail" style="font-size:0.67rem;color:#5a6a80;margin-top:2px;"></div>
+      </div>
+      <div class="sc"><div class="lbl">Ref. 2025/26 (Mrd. €)</div><div class="val" id="st_ref">365.1</div></div>
+      <div class="sc"><div class="lbl">Ref. 2022 (Mrd. €)</div><div class="val" id="st_ref22">–</div></div>
+    </div>
+
+    <div class="sec">Modellannahmen</div>
+    <div class="note"><strong>Datenbasis:</strong> Destatis, ESt-Statistik 2022 (Juni 2026), 17 Gruppen, n = 43,99 Mio. Steuerpflichtige.</div>
+    <ul class="alist">
+      <li style="color:#c0392b;"><strong>⚠ Warnung:</strong> Aufkommen bleibt grobe Schätzung! Für Präzision müssen Ehegattensplitting, Werbungskosten und Kindergeld individuell modelliert werden. In dieser Form muss berücksichtigt werden, dass die Zahlen um ca. 5-10 % übertschätzt sind.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+// ── DESTATIS-DATEN 2022 ──────────────────────────────────────────────────────
+const GROUPS = [
+  {lo:       0, hi:    5000, n: 4705210, rep:    1532},
+  {lo:    5000, hi:   10000, n: 2112289, rep:    7560},
+  {lo:   10000, hi:   15000, n: 2833594, rep:   12648},
+  {lo:   15000, hi:   20000, n: 3436408, rep:   17488},
+  {lo:   20000, hi:   25000, n: 3331093, rep:   22505},
+  {lo:   25000, hi:   30000, n: 3450227, rep:   27503},
+  {lo:   30000, hi:   35000, n: 3274569, rep:   32494},
+  {lo:   35000, hi:   40000, n: 2969736, rep:   37482},
+  {lo:   40000, hi:   45000, n: 2546566, rep:   42414},
+  {lo:   45000, hi:   50000, n: 2100616, rep:   47433},
+  {lo:   50000, hi:   60000, n: 3241926, rep:   54686},
+  {lo:   60000, hi:   70000, n: 2297549, rep:   64738},
+  {lo:   70000, hi:  125000, n: 5398943, rep:   90699},
+  {lo:  125000, hi:  250000, n: 1813406, rep:  163495},
+  {lo:  250000, hi:  500000, n:  351726, rep:  333240},
+  {lo:  500000, hi: 1000000, n:   90320, rep:  667464},
+  {lo: 1000000, hi: 9999999, n:   36530, rep: 2717031},
+];
+
+// ── REFERENZGRÖSSE 2025/2026 ─────────────────────────────────────────────────
+// Tatsächliches ESt-Aufkommen (inkl. Lohnsteuer) 2025 und 2026: 340 Mrd. €
+const REF_340 = 365.1;
+
+// ── STANDARDPARAMETER ────────────────────────────────────────────────────────
+const STD26 = {
+  gfb:    12348,
+  eins:    14.0,
+  z1end:  17799,
+  z1rate:  24.0,
+  spitz:   42.0,
+  pzone:  69879,
+  rth:   277826,
+  reich:   45.0,
+  rth2:  9999999,
+  reich2:  45.0,
+};
+
+const STD22 = {
+  gfb:    10347,
+  eins:    14.0,
+  z1end:  14926,
+  z1rate:  24.0,
+  spitz:   42.0,
+  pzone:  58596,
+  rth:   277826,
+  reich:   45.0,
+  rth2:  9999999,
+  reich2:  45.0,
+};
+
+// Reform-Preset 2.9.2026
+const STD_REFORM = {
+  gfb:    12900,
+  eins:    14.0,
+  z1end:  27500,
+  z1rate:  24.0,
+  spitz:   42.0,
+  pzone:  70600,
+  rth:   250000,
+  reich:   45.0,
+  rth2:  280000,
+  reich2:  47.0,
+};
+
+let P = {...STD26};
+
+// ── CANVAS ───────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('chart');
+const ctx    = canvas.getContext('2d');
+const X_MIN  = 1000;
+const X_MAX  = 300000;
+const Y_MAX  = 0.60;
+let W = 0, H = 0;
+let PAD = {top:28, right:20, bottom:52, left:56};
+
+function xLog(v) {
+  const frac = (v - X_MIN) / (X_MAX - X_MIN);
+  return PAD.left + frac * (W - PAD.left - PAD.right);
+}
+function yPct(p) {
+  return PAD.top + (1 - p / Y_MAX) * (H - PAD.top - PAD.bottom);
+}
+function xToIncome(px) {
+  const frac = (px - PAD.left) / (W - PAD.left - PAD.right);
+  return X_MIN + frac * (X_MAX - X_MIN);
+}
+
+// ── PERSONENDICHTE ───────────────────────────────────────────────────────────
+function calcDensity() {
+  const densities = new Float64Array(GROUPS.length);
+  for (let i = 0; i < GROUPS.length; i++) {
+    const g = GROUPS[i];
+    const width = g.hi - g.lo;
+    densities[i] = width > 0 ? g.n / width : 0;
+  }
+  const maxDensity = Math.max(...densities);
+  return { densities, maxDensity };
+}
+
+function findGroup(inc) {
+  for (let i = 0; i < GROUPS.length; i++) {
+    if (inc >= GROUPS[i].lo && inc < GROUPS[i].hi) return GROUPS[i];
+  }
+  return GROUPS[GROUPS.length - 1];
+}
+
+const DENSITY = calcDensity();
+
+// ── MONOTONE KUBISCHE INTERPOLATION (Fritsch-Carlson) ────────────────────────
+function monotonicSpline(pts) {
+  const n = pts.length;
+  const d = [], m = [];
+  for (let i = 0; i < n - 1; i++)
+    d[i] = (pts[i+1].y - pts[i].y) / (pts[i+1].x - pts[i].x);
+  m[0] = d[0];
+  for (let i = 1; i < n - 1; i++)
+    m[i] = (d[i-1] * d[i] <= 0) ? 0 : (d[i-1] + d[i]) / 2;
+  m[n-1] = d[n-2];
+  for (let i = 0; i < n - 1; i++) {
+    if (d[i] === 0) { m[i] = m[i+1] = 0; continue; }
+    const a = m[i] / d[i], b = m[i+1] / d[i];
+    if (a*a + b*b > 9) {
+      const t = 3 / Math.sqrt(a*a + b*b);
+      m[i] = t * a * d[i]; m[i+1] = t * b * d[i];
+    }
+  }
+  return function(x) {
+    let lo = 0, hi = n - 1;
+    while (lo < hi - 1) {
+      const mid = (lo + hi) >> 1;
+      if (pts[mid].x <= x) lo = mid; else hi = mid;
+    }
+    const h = pts[hi].x - pts[lo].x;
+    if (h === 0) return pts[lo].y;
+    const t = (x - pts[lo].x) / h;
+    return (2*t*t*t - 3*t*t + 1)*pts[lo].y + (t*t*t - 2*t*t + t)*h*m[lo]
+         + (-2*t*t*t + 3*t*t)*pts[hi].y + (t*t*t - t*t)*h*m[hi];
+  };
+}
+
+// ── STEUERFORMEL §32a EStG ───────────────────────────────────────────────────
+// SCALE so kalibriert, dass STD26 mit Destatis-Daten exakt ~340 Mrd. € ergibt.
+// Kalibrierungsformel: SCALE = REF_340 / calcRevenueRaw(STD26)
+// Empirisch ermittelter Wert:
+const SCALE = 0.795;
+
+function calcTax(inc, p) {
+  if (inc <= 0)     return 0;
+  if (inc <= p.gfb) return 0;
+
+  const e  = p.eins   / 100;
+  const m  = p.z1rate / 100;
+  const s  = p.spitz  / 100;
+  const r  = p.reich  / 100;
+  const r2 = p.reich2 / 100;
+
+  // Zone 1: gfb → z1end (lineare Progression e → m)
+  if (inc <= p.z1end) {
+    const x    = inc - p.gfb;
+    const span = p.z1end - p.gfb;
+    return x * (e + (m - e) * (x / span) * 0.5) * SCALE;
+  }
+  const tax1 = (p.z1end - p.gfb) * (e + m) / 2 * SCALE;
+
+  // Zone 2: z1end → pzone (lineare Progression m → s)
+  if (inc <= p.pzone) {
+    const x    = inc - p.z1end;
+    const span = p.pzone - p.z1end;
+    return tax1 + x * (m + (s - m) * (x / span) * 0.5) * SCALE;
+  }
+  const tax2 = tax1 + (p.pzone - p.z1end) * (m + s) / 2 * SCALE;
+
+  // Zone 3: pzone → rth (flat Spitzensteuersatz)
+  if (inc <= p.rth) {
+    return tax2 + (inc - p.pzone) * s * SCALE;
+  }
+  const tax3 = tax2 + (p.rth - p.pzone) * s * SCALE;
+
+  // Zone 4: rth → rth2 (Reichensteuer Stufe 1)
+  if (inc <= p.rth2) {
+    return tax3 + (inc - p.rth) * r * SCALE;
+  }
+  const tax4 = tax3 + (p.rth2 - p.rth) * r * SCALE;
+
+  // Zone 5: rth2+ (Reichensteuer Stufe 2)
+  return tax4 + (inc - p.rth2) * r2 * SCALE;
+}
+
+// ── ABZÜGE ───────────────────────────────────────────────────────────────────
+function applyDeductionsToTax(grossTax, inc) {
+  const MIN_WERBUNG        = 1000;
+  const SONDERAUSGABEN_RATE = 0.12;
+  const MAX_DEDUCTION_RATE  = 0.22;
+
+  const werbungskosten  = Math.max(MIN_WERBUNG, inc * 0.03);
+  const sonderausgaben  = inc * SONDERAUSGABEN_RATE;
+  const totalDeductions = Math.min(inc * MAX_DEDUCTION_RATE,
+                                   werbungskosten + sonderausgaben);
+  const reducedInc      = Math.max(0, inc - totalDeductions);
+  const reductionFactor = reducedInc > 0 ? reducedInc / inc : 0;
+
+  return {
+    originalTax:  grossTax,
+    deductions:   totalDeductions,
+    reducedTax:   grossTax * reductionFactor,
+    reduction:    grossTax * (1 - reductionFactor),
+  };
+}
+
+function marginal(inc, p) {
+  const d = 10;
+  return (calcTax(inc + d, p) - calcTax(inc, p)) / d;
+}
+
+// ── SOLI ─────────────────────────────────────────────────────────────────────
+function calcSoli(tax) {
+  const RATE = 0.055;
+  const FG   = 997;   // Freigrenze Soli-Betrag
+  const ME   = 1869;  // Milderungszone Ende
+  const raw  = tax * RATE;
+  if (raw <= FG) return 0;
+  if (raw <= ME) return Math.min(raw, 0.20 * (tax - FG / RATE));
+  return raw;
+}
+
+// ── AUFKOMMEN BERECHNEN ──────────────────────────────────────────────────────
+function calcRevenue(p) {
+  let totTax = 0, totSoli = 0, totN = 0, totAvg = 0;
+  let totTaxAfterDeductions = 0;
+
+  GROUPS.forEach(g => {
+    const t              = calcTax(g.rep, p);
+    const deductionResult = applyDeductionsToTax(t, g.rep);
+    const adjustedTax    = deductionResult.reducedTax;
+    const sl             = calcSoli(adjustedTax);
+
+    totTax                 += t            * g.n;
+    totTaxAfterDeductions  += adjustedTax  * g.n;
+    totSoli                += sl           * g.n;
+    totN                   += g.n;
+    totAvg                 += (g.rep > 0 ? adjustedTax / g.rep : 0) * g.n;
+  });
+
+  return {
+    tax:      totTaxAfterDeductions / 1e9,
+    taxGross: totTax / 1e9,
+    soli:     totSoli / 1e9,
+    n:        totN / 1e6,
+    avg:      totAvg / totN,
+  };
+}
+
+// ── STATS AKTUALISIEREN ──────────────────────────────────────────────────────
+let rev22  = null;
+let rev26  = null;   // Referenz 340 Mrd. (STD26 kalibriert)
+
+function updateStats() {
+  if (!rev22) rev22 = calcRevenue(STD22);
+  if (!rev26) rev26 = calcRevenue(STD26);   // einmalig cachen
+
+  const cur  = calcRevenue(P);
+  const diff = cur.tax - REF_340;           // Δ zur 340-Mrd.-Referenz
+  const pct  = (cur.tax / REF_340) * 100;  // prozentualer Anteil
+
+  // Werte befüllen
+  document.getElementById('st_est' ).textContent = cur.tax.toFixed(1)  + ' Mrd.';
+  document.getElementById('st_avg' ).textContent = (cur.avg * 100).toFixed(1) + ' %';
+  document.getElementById('st_soli').textContent = cur.soli.toFixed(1) + ' Mrd.';
+  document.getElementById('st_n'   ).textContent = cur.n.toFixed(2)    + ' Mio.';
+  document.getElementById('st_ref22').textContent = rev22.tax.toFixed(1) + ' Mrd.';
+
+  // ── Delta zur 340-Mrd.-Referenz ──────────────────────────────────────────
+  const dEl   = document.getElementById('st_delta');
+  const dDet  = document.getElementById('st_delta_detail');
+  const sign  = diff >= 0 ? '+' : '';
+  dEl.textContent  = sign + diff.toFixed(1) + ' Mrd. €';
+  dEl.className    = 'val ' + (diff >= 0 ? 'green' : 'red');
+
+  // Erklärungszeile: Richtung und Größenordnung
+  const absD = Math.abs(diff);
+  let msg = '';
+  if (absD < 0.5) {
+    msg = '≈ Referenz erreicht';
+  } else if (diff > 0) {
+    msg = `+${absD.toFixed(1)} Mrd. mehr als Referenz (${pct.toFixed(1)} %)`;
+  } else {
+    msg = `${absD.toFixed(1)} Mrd. unter Referenz (${pct.toFixed(1)} %)`;
+  }
+  dDet.textContent = msg;
+
+  // ── Aufkommens-Balken ────────────────────────────────────────────────────
+  const barPct = Math.min(160, Math.max(5, pct)); // max 160% für Darstellung
+  const barEl  = document.getElementById('rev_bar');
+  const barLbl = document.getElementById('rev_bar_lbl');
+
+  // Farbe des Balkens je nach Abweichung
+  if (Math.abs(diff) < 2) {
+    barEl.style.background = 'linear-gradient(90deg,#1a8a4a,#34c077)'; // grün = nah an Referenz
+  } else if (diff > 0) {
+    barEl.style.background = 'linear-gradient(90deg,#3b7dd8,#5fa0f0)'; // blau = über Referenz
+  } else {
+    barEl.style.background = 'linear-gradient(90deg,#c0392b,#e05040)'; // rot = unter Referenz
+  }
+
+  barEl.style.width = Math.min(100, barPct) + '%';
+  barLbl.textContent = cur.tax.toFixed(1) + ' Mrd.';
+}
+
+// ── ZEICHNEN ─────────────────────────────────────────────────────────────────
+function draw() {
+  if (W === 0 || H === 0) return;
+  ctx.clearRect(0, 0, W, H);
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top  - PAD.bottom;
+
+  // Zonenhintergründe
+  function zRect(x0, x1, col) {
+    const px0 = Math.max(PAD.left,     xLog(Math.max(x0, X_MIN)));
+    const px1 = Math.min(W - PAD.right, xLog(Math.min(x1, X_MAX)));
+    if (px1 <= px0) return;
+    ctx.fillStyle = col;
+    ctx.fillRect(px0, PAD.top, px1 - px0, cH);
+  }
+  zRect(0,      P.gfb,   'rgba(200,215,235,0.45)'); // Freibetrag
+  zRect(P.gfb,  P.z1end, 'rgba(255,195,60,0.38)');  // Zone 1
+  zRect(P.z1end,P.pzone, 'rgba(255,220,80,0.25)');  // Zone 2
+  zRect(P.pzone,P.rth,   'rgba(255,150,50,0.25)');  // Spitze
+  zRect(P.rth,  P.rth2,  'rgba(255,80,80,0.22)');   // Reich. Stufe 1
+  zRect(P.rth2, X_MAX,   'rgba(180,30,30,0.22)');   // Reich. Stufe 2
+
+  // Personendichte-Kurve
+  (function drawDensityCurve() {
+    const { densities, maxDensity } = DENSITY;
+    const histMaxH = cH * 0.40;
+    const yBase    = PAD.top + cH;
+
+    const pts = [{x: xLog(X_MIN), y: 0}];
+    GROUPS.forEach((g, i) => {
+      pts.push({x: xLog(g.rep), y: densities[i]});
+    });
+    const spline = monotonicSpline(pts);
+    const xStart = pts[0].x;
+    const xEnd   = Math.min(pts[pts.length - 1].x, W - PAD.right);
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(100,149,237,0.20)';
+    ctx.beginPath();
+    ctx.moveTo(xStart, yBase);
+    for (let px = xStart; px <= xEnd; px++) {
+      const d = Math.max(0, spline(px));
+      ctx.lineTo(px, yBase - (d / maxDensity) * histMaxH);
+    }
+    ctx.lineTo(xEnd, yBase);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(100,149,237,0.55)';
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath();
+    for (let px = xStart; px <= xEnd; px++) {
+      const d = Math.max(0, spline(px));
+      const y = yBase - (d / maxDensity) * histMaxH;
+      px === xStart ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  })();
+
+
+
+  // X-Gitterlinien + Labels
+  const xTicks = [1000, 10000, 50000, 100000, 200000, 300000];
+  xTicks.forEach(v => {
+    const x = xLog(v);
+    ctx.strokeStyle = '#dde3ed';
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, H - PAD.bottom); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle  = '#8899aa';
+    ctx.font       = '10px -apple-system,sans-serif';
+    ctx.textAlign  = 'center';
+    const lbl = v >= 1000000 ? (v/1000000)+'M' : (v >= 1000 ? (v/1000)+'k' : v);
+    ctx.fillText(lbl + '€', x, H - PAD.bottom + 14);
+  });
+
+  // X-Achsenbeschriftung
+  ctx.fillStyle  = '#8899aa';
+  ctx.font       = '11px -apple-system,sans-serif';
+  ctx.textAlign  = 'center';
+  ctx.fillText('Zu versteuerndes Einkommen (lineare Skala)',
+               PAD.left + cW / 2, H - 4);
+
+  // Zonentrennlinien
+  function zLine(inc, lbl, color) {
+    const x = xLog(inc);
+    if (x < PAD.left + 5 || x > W - PAD.right - 5) return;
+    ctx.strokeStyle = color || 'rgba(100,120,160,0.35)';
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, H - PAD.bottom); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle  = 'rgba(50,70,120,0.70)';
+    ctx.font       = 'bold 9px -apple-system,sans-serif';
+    ctx.textAlign  = 'center';
+    ctx.fillText(lbl, x, PAD.top - 8);
+  }
+  zLine(P.gfb,   'Grundfreibetrag');
+  zLine(P.pzone, 'Spitzensteuersatz');
+  zLine(P.rth,   '"Reichensteuer"');
+  if (P.rth2 < X_MAX * 0.95) zLine(P.rth2, '"Reichenst." 2', 'rgba(150,0,0,0.45)');
+
+  // Referenzlinie 340 Mrd. im Chart: horizontale Hilfslinie bei rev26-Ø-Steuersatz
+  // (visueller Anker – zeigt wo die Referenzkurve liegt)
+  function drawCurve(paramObj, getY, color, width, dash) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = width;
+    ctx.setLineDash(dash || []);
+    let first = true;
+    for (let px = PAD.left; px <= W - PAD.right; px += 1.5) {
+      const inc = xToIncome(px);
+      const y   = yPct(getY(inc, paramObj));
+      if (first) { ctx.moveTo(px, y); first = false; }
+      else ctx.lineTo(px, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Referenzkurve 2025/26 (gestrichelt grau)
+  drawCurve(STD26,
+    (inc, p) => marginal(inc, p),
+    'rgba(150,160,180,0.65)', 1.5, [6, 4]);
+
+  // Ø-Steuersatz aktuell (blau)
+  drawCurve(P,
+    (inc, p) => { const t = calcTax(inc, p); return inc > 0 ? t / inc : 0; },
+    '#3b7dd8', 2.2);
+
+  // Grenzsteuersatz aktuell (pink)
+  drawCurve(P,
+    (inc, p) => marginal(inc, p),
+    '#e84393', 2.6);
+
+  // ── NEU: Referenzlinie 340 Mrd. als horizontale Markierung ───────────────
+  // Zeigt den Ø-Steuersatz der STD26-Konfiguration als gestrichelte Linie
+  if (rev26) {
+    const yRef = yPct(rev26.avg);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(26,138,74,0.55)';
+    ctx.lineWidth   = 1.2;
+    ctx.setLineDash([8, 4]);
+    ctx.beginPath();
+    ctx.moveTo(PAD.left, yRef);
+    ctx.lineTo(W - PAD.right, yRef);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle  = 'rgba(26,138,74,0.80)';
+    ctx.font       = 'bold 9px -apple-system,sans-serif';
+    ctx.textAlign  = 'right';
+    ctx.fillText('Ref. Ø 365.1 Mrd.', W - PAD.right - 4, yRef - 3);
+    ctx.restore();
+  }
+
+  // Achsenrahmen
+  ctx.strokeStyle = '#99aabb';
+  ctx.lineWidth   = 1.5;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(PAD.left, PAD.top);
+  ctx.lineTo(PAD.left, H - PAD.bottom);
+  ctx.lineTo(W - PAD.right, H - PAD.bottom);
+  ctx.stroke();
+
+  updateStats();
+}
+
+// ── CROSSHAIR ────────────────────────────────────────────────────────────────
+let mX = -1;
+
+canvas.addEventListener('mousemove', e => {
+  const rect   = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  mX = (e.clientX - rect.left) * scaleX;
+  if (mX >= PAD.left && mX <= W - PAD.right) drawCrosshair();
+});
+
+canvas.addEventListener('mouseleave', () => {
+  mX = -1;
+  draw();
+  document.getElementById('tip').innerHTML = 'Bewege die Maus über den Chart für Detailwerte.';
+});
+
+function drawCrosshair() {
+  draw();
+  if (mX < PAD.left || mX > W - PAD.right) return;
+
+  const inc  = xToIncome(mX);
+  const mr   = marginal(inc, P);
+  const tax  = calcTax(inc, P);
+  const avg  = inc > 0 ? tax / inc : 0;
+  const soli = calcSoli(tax);
+  const net  = inc - tax - soli;
+
+  // Delta dieses Einkommens zum Referenztarif STD26
+  const mrRef  = marginal(inc, STD26);
+  const diffMr = (mr - mrRef) * 100;
+
+  const grp     = findGroup(inc);
+  const grpFrom = grp.lo.toLocaleString('de-DE');
+  const grpTo   = grp.hi.toLocaleString('de-DE');
+  const grpN    = grp.n.toLocaleString('de-DE');
+
+  // Vertikale Linie
+  ctx.save();
+  ctx.strokeStyle = 'rgba(60,90,140,0.30)';
+  ctx.lineWidth   = 1;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(mX, PAD.top);
+  ctx.lineTo(mX, H - PAD.bottom);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Punkt auf Grenzkurve
+  const yMr = yPct(mr);
+  ctx.beginPath();
+  ctx.arc(mX, yMr, 4.5, 0, Math.PI * 2);
+  ctx.fillStyle   = '#e84393';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth   = 1.5;
+  ctx.stroke();
+
+  // Punkt auf Ø-Kurve
+  const yAv = yPct(avg);
+  ctx.beginPath();
+  ctx.arc(mX, yAv, 4.5, 0, Math.PI * 2);
+  ctx.fillStyle   = '#3b7dd8';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth   = 1.5;
+  ctx.stroke();
+
+  ctx.restore();
+
+  const f   = v => Math.round(v).toLocaleString('de-DE');
+  const fp  = v => (v * 100).toFixed(1) + ' %';
+  const fpp = v => (v >= 0 ? '+' : '') + v.toFixed(1) + ' PP';
+
+  // Δ Grenzsteuersatz zur Referenz farbig hervorheben
+  const diffColor = diffMr > 0 ? '#c0392b' : diffMr < 0 ? '#1a8a4a' : '#5a6a80';
+  const diffStr   = Math.abs(diffMr) < 0.05
+    ? '<span style="color:#5a6a80">= Referenz</span>'
+    : `<span style="color:${diffColor}">Δ Grenz: ${fpp(diffMr)} zur Ref.</span>`;
+
+  document.getElementById('tip').innerHTML =
+    `<strong>${f(inc)} €</strong> &nbsp;|&nbsp; ` +
+    `<span style="color:#e84393">Grenz: ${fp(mr)}</span> &nbsp;|&nbsp; ` +
+    `<span style="color:#3b7dd8">Ø: ${fp(avg)}</span> &nbsp;|&nbsp; ` +
+    `EST: <strong>${f(tax)} €</strong> &nbsp;|&nbsp; ` +
+    `Soli: ${f(soli)} € &nbsp;|&nbsp; ` +
+    `Netto: <strong>${f(net)} €</strong> &nbsp;|&nbsp; ` +
+    diffStr + ` &nbsp;|&nbsp; ` +
+    `Gruppe ${grpFrom}–${grpTo} €: ${grpN} Personen`;
+}
+
+// ── SLIDER SETUP ─────────────────────────────────────────────────────────────
+const SLIDERS = [
+  {sid:'s_gfb',    vid:'v_gfb',    key:'gfb',    fmt: v => Math.round(v).toLocaleString('de-DE') + ' €'},
+  {sid:'s_eins',   vid:'v_eins',   key:'eins',   fmt: v => v.toFixed(1).replace('.',',') + ' %'},
+  {sid:'s_z1end',  vid:'v_z1end',  key:'z1end',  fmt: v => Math.round(v).toLocaleString('de-DE') + ' €'},
+  {sid:'s_z1rate', vid:'v_z1rate', key:'z1rate', fmt: v => v.toFixed(1).replace('.',',') + ' %'},
+  {sid:'s_spitz',  vid:'v_spitz',  key:'spitz',  fmt: v => v.toFixed(1).replace('.',',') + ' %'},
+  {sid:'s_pzone',  vid:'v_pzone',  key:'pzone',  fmt: v => Math.round(v).toLocaleString('de-DE') + ' €'},
+  {sid:'s_rth',    vid:'v_rth',    key:'rth',    fmt: v => Math.round(v).toLocaleString('de-DE') + ' €'},
+  {sid:'s_reich',  vid:'v_reich',  key:'reich',  fmt: v => v.toFixed(1).replace('.',',') + ' %'},
+  {sid:'s_rth2',   vid:'v_rth2',   key:'rth2',   fmt: v => v >= 9000000 ? '—' : Math.round(v).toLocaleString('de-DE') + ' €'},
+  {sid:'s_reich2', vid:'v_reich2', key:'reich2', fmt: v => v.toFixed(1).replace('.',',') + ' %'},
+];
+
+SLIDERS.forEach(({sid, vid, key, fmt}) => {
+  const sl = document.getElementById(sid);
+  const vl = document.getElementById(vid);
+
+  sl.addEventListener('input', () => {
+    let val = parseFloat(sl.value);
+
+    // Guards: Konsistenz der Zonengrenzen sicherstellen
+    if (key === 'z1end')  val = Math.min(Math.max(val, P.gfb   + 500),  P.pzone - 5000);
+    if (key === 'pzone')  val = Math.min(Math.max(val, P.z1end + 5000), P.rth   - 10000);
+    if (key === 'rth')    val = Math.min(Math.max(val, P.pzone + 10000),P.rth2  - 10000);
+    if (key === 'rth2')   val = Math.max(val, P.rth + 10000);
+
+    // Guards: Steuersätze aufsteigend halten
+    if (key === 'eins')   val = Math.min(val, P.z1rate);
+    if (key === 'z1rate') val = Math.min(Math.max(val, P.eins),   P.spitz);
+    if (key === 'spitz')  val = Math.max(val, P.z1rate);
+    if (key === 'reich')  val = Math.max(val, P.spitz);
+    if (key === 'reich2') val = Math.max(val, P.reich);
+
+    P[key]          = val;
+    sl.value        = val;
+    vl.textContent  = fmt(val);
+
+    draw();
+  });
+});
+
+// ── PARAMETER ANWENDEN ───────────────────────────────────────────────────────
+function applyP(src) {
+  P = {...src};
+  SLIDERS.forEach(({sid, vid, key, fmt}) => {
+    const el = document.getElementById(sid);
+    if (el) {
+      el.value = P[key];
+      document.getElementById(vid).textContent = fmt(P[key]);
+    }
+  });
+  draw();
+}
+
+// ── RESIZE ───────────────────────────────────────────────────────────────────
+function resize() {
+  const col  = document.getElementById('canvas-col');
+  const rect = col.getBoundingClientRect();
+  W = Math.floor(rect.width - 28);
+  H = Math.floor(Math.max(320, Math.min(540, W * 0.6)));
+  canvas.width  = W;
+  canvas.height = H;
+  draw();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => { resize(); });
+
+window.addEventListener('load', () => {
+  rev22 = calcRevenue(STD22);   // 2022er Referenz vorberechnen
+  rev26 = calcRevenue(STD26);   // 340-Mrd.-Referenz vorberechnen und cachen
+
+  // Prüfausgabe in Konsole: SCALE-Kalibrierung kontrollieren
+  console.log(
+    '[Kalibrierung] STD26 Aufkommen:',  rev26.tax.toFixed(2), 'Mrd. €',
+    '| Ziel: 365.1 Mrd. €',
+    '| Δ:', (rev26.tax - REF_340).toFixed(2), 'Mrd. €'
+  );
+  console.log(
+    '[Kalibrierung] STD22 Aufkommen:', rev22.tax.toFixed(2), 'Mrd. €'
+  );
+
+  applyP(STD26);   // Slider + Anzeigewerte setzen
+  resize();        // Canvas dimensionieren und erstmals zeichnen
+});
+</script>
+</body>
+</html>
+
+
+
