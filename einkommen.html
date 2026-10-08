@@ -603,6 +603,24 @@ function draw() {
   zLine(P.rth,   '"Reichensteuer"');
   if (P.rth2 < X_MAX * 0.95) zLine(P.rth2, '"Reichenst." 2', 'rgba(150,0,0,0.45)');
 
+  // Referenzlinie 340 Mrd. im Chart: horizontale Hilfslinie bei rev26-Ø-Steuersatz
+  // (visueller Anker – zeigt wo die Referenzkurve liegt)
+  function drawCurve(paramObj, getY, color, width, dash) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = width;
+    ctx.setLineDash(dash || []);
+    let first = true;
+    for (let px = PAD.left; px <= W - PAD.right; px += 1.5) {
+      const inc = xToIncome(px);
+      const y   = yPct(getY(inc, paramObj));
+      if (first) { ctx.moveTo(px, y); first = false; }
+      else ctx.lineTo(px, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
   // Referenzkurve 2025/26 (gestrichelt grau)
   drawCurve(STD26,
     (inc, p) => marginal(inc, p),
@@ -617,26 +635,6 @@ function draw() {
   drawCurve(P,
     (inc, p) => marginal(inc, p),
     '#e84393', 2.6);
-
-  // ── NEU: Referenzlinie 340 Mrd. als horizontale Markierung ───────────────
-  // Zeigt den Ø-Steuersatz der STD26-Konfiguration als gestrichelte Linie
-  if (rev26) {
-    const yRef = yPct(rev26.avg);
-    ctx.save();
-    ctx.strokeStyle = 'rgba(26,138,74,0.55)';
-    ctx.lineWidth   = 1.2;
-    ctx.setLineDash([8, 4]);
-    ctx.beginPath();
-    ctx.moveTo(PAD.left, yRef);
-    ctx.lineTo(W - PAD.right, yRef);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle  = 'rgba(26,138,74,0.80)';
-    ctx.font       = 'bold 9px -apple-system,sans-serif';
-    ctx.textAlign  = 'right';
-    ctx.fillText('Ref. Ø 365.1 Mrd.', W - PAD.right - 4, yRef - 3);
-    ctx.restore();
-  }
 
   // Achsenrahmen
   ctx.strokeStyle = '#99aabb';
@@ -830,6 +828,4 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
-
-
 
