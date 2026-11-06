@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>(Was) kann Deutschland von anderen Ländern lernen?</title>
+<style>
+  :root{
+    --lila:#8e3a8e;
+    --lila-hell:#f3e6f3;
+    --petrol:#1a7f9c;
+    --text:#222;
+    --grau:#666;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#2b2b2b;font-family:"Segoe UI",Calibri,Arial,sans-serif;color:var(--text)}
+  .deck{position:relative;width:100vw;height:100vh;overflow:hidden}
+  .slide{
+    position:absolute;inset:0;margin:auto;
+    width:min(100vw,177.78vh);height:min(100vh,56.25vw);
+    background:#fff;padding:4.5% 6% 6% 6%;
+    display:none;flex-direction:column;
+    font-size:min(2.3vw,4.1vh);
+  }
+  .slide.active{display:flex}
+  .kopf{
+    position:absolute;top:2.5%;right:6%;left:6%;
+    display:flex;justify-content:flex-end;
+    font-size:.55em;color:var(--grau);
+    border-bottom:1px solid #999;padding-bottom:.3em
+  }
+  h1{color:var(--petrol);font-size:1.55em;line-height:1;margin-bottom:.4em}
+  h2{color:var(--petrol);font-size:1.55em;margin:.6em 0 .6em}
+  h3{color:var(--lila);font-size:1.05em;margin-bottom:.3em}
+  p,li{line-height:1.2}
+ .klein{font-size:.8em}
+  ul,ol{padding-left:1.2em}
+  li{margin-bottom:.35em}
+  .klein{font-size:.8em}
+  .sehrklein{font-size:.65em}
+  .grau{color:var(--grau)}
+  strong{color:var(--lila)}
+  .zwei{display:grid;grid-template-columns:1fr 1fr;gap:4%;flex:1}
+  .drei{display:grid;grid-template-columns:repeat(3,1fr);gap:1em}
+  .box{background:var(--lila-hell);border-left:.3em solid var(--lila);padding:.7em .9em;border-radius:.3em}
+  .box.petrol{background:#e3f2f6;border-color:var(--petrol)}
+  .karte{border:2px solid var(--lila);border-radius:.5em;padding:.6em .7em;display:flex;flex-direction:column;gap:.3em}
+  .karte .nr{background:var(--lila);color:#fff;border-radius:50%;width:1.6em;height:1.6em;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:.8em}
+  .karte .titel{font-weight:bold;font-size:.8em}
+  .karte .frage{font-size:.7em;color:var(--grau)}
+  .placeholder{
+    border:3px dashed var(--lila);background:#faf5fa;color:var(--lila);
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    font-size:.7em;padding:1em;border-radius:.5em;min-height:6em
+  }
+  .titelfolie{justify-content:center}
+  .titelfolie h1{font-size:2.6em}
+  table{border-collapse:collapse;width:100%;font-size:.62em}
+  th{background:var(--lila);color:#fff;text-align:left;padding:.4em .5em}
+  td{border:1px solid #ccc;padding:.35em .5em;vertical-align:top}
+  tr:nth-child(even) td{background:#faf5fa}
+  td:first-child{font-weight:bold;font-style:italic;white-space:nowrap}
+  .zeitplan td:first-child{font-style:normal;color:var(--lila)}
+  .zeitplan{font-size:.85em}
+  .zitat{font-style:italic;background:#f7f7f7;padding:.7em 1em;border-radius:.3em;font-size:.85em}
+  .nav{
+    position:fixed;bottom:1.2vh;left:50%;transform:translateX(-50%);
+    display:flex;gap:.6em;align-items:center;z-index:10;
+    background:rgba(0,0,0,.55);padding:.3em .8em;border-radius:2em;color:#fff;font-size:14px
+  }
+  .nav button{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:0 .4em}
+  .fortschritt{position:fixed;top:0;left:0;height:4px;background:var(--lila);z-index:10;transition:width .2s}
+  @media print{
+    body{background:#fff}
+    .nav,.fortschritt{display:none}
+    .slide{display:flex !important;position:relative;page-break-after:always;width:100%;height:100vh}
+  }
+</style>
+</head>
+<body>
+<div class="fortschritt" id="fortschritt"></div>
+<div class="deck">
+
+<!-- 1 Titel -->
+<section class="slide active titelfolie">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <div class="zwei" style="align-items:center;flex:none">
+    <div>
+      <h1>(Was) kann Deutschland von anderen Ländern lernen?</h1>
+      <p class="grau">Projektarbeit in Gruppen</p>
+    </div>
+    <div><img style="max-height:14em" class="placeholder" src="1.png" alt="Wegweiser"></div>
+  </div>
+</section>
+
+<!-- 2 Worum geht es -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Worum geht es?</h2>
+  <div class="zwei">
+    <div>
+      <p>In den nächsten zwei Wochen erarbeitet ihr als Gruppe ein <strong>politisches oder wirtschaftliches Modell</strong> eines anderen Landes.</p>
+      <ul style="margin-top:.8em">
+        <li>Ihr <strong>vergleicht</strong> es mit der Situation in Deutschland.</li>
+        <li>Ihr kommt zu einem <strong>begründeten Urteil</strong>: Was kann Deutschland lernen, und wo liegen die Grenzen einer Übertragung?</li>
+        <li>Ihr <strong>präsentiert</strong> eure Ergebnisse dem Kurs.</li>
+      </ul>
+    </div>
+    <div><img style="max-height:18em" class="placeholder" src="flaggen.jpeg" alt="Flaggen"></div>
+  </div>
+</section>
+
+<!-- 3 Themen -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Sechs Themen</h2>
+  <div class="drei">
+    <div class="karte"><div class="nr">1</div><div class="titel">Einwanderungspolitik</div><div class="frage">Kanadas Punktesystem als Modell für Deutschland?</div></div>
+    <div class="karte"><div class="nr">2</div><div class="titel">Das irische Niedrigsteuermodell</div><div class="frage">Legitime Standortpolitik oder ruinöse Wettbewerbspolitik?</div></div>
+    <div class="karte"><div class="nr">3</div><div class="titel">Rente mit 70</div><div class="frage">Dänemarks Folkepension als Vorbild?</div></div>
+    <div class="karte"><div class="nr">4</div><div class="titel">Braucht Deutschland eine Wahlpflicht?</div><div class="frage">Australien und Luxemburg als Vorbilder?</div></div>
+    <div class="karte"><div class="nr">5</div><div class="titel">Wiens sozialer Wohnungsbau</div><div class="frage">Modell für deutsche Großstädte?</div></div>
+    <div class="karte"><div class="nr">6</div><div class="titel">Estland als Vorbild?</div><div class="frage">Verwaltungsdigitalisierung in Deutschland</div></div>
+  </div>
+  <p class="klein grau" style="margin-top:1em">Jede Gruppe (ca. 4 Mitglieder) erhält abgestimmtes Ausgangsmaterial.</p>
+</section>
+
+<!-- 4 Zeitplan -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Zeitplan</h2>
+  <table class="zeitplan">
+    <tr><th>Datum</th><th>Was passiert?</th></tr>
+    <tr><td>13.11.</td><td>Arbeitszeit („Vertretung ohne Lehrer“)</td></tr>
+    <tr><td>20.11.</td><td>Arbeitszeit („Vertretung ohne Lehrer“) · <strong>Abgabe Zwischenstand (LMS)</strong></td></tr>
+    <tr><td>26.11.</td><td><strong>Abgabe Gesamtpaket (LMS)</strong></td></tr>
+    <tr><td>27.11.</td><td>Präsentation (3 Themen, Reihenfolge wird gelost)</td></tr>
+    <tr><td>4.12.</td><td>Präsentation (3 Themen, Reihenfolge wird gelost)</td></tr>
+  </table>
+  <div class="box" style="margin-top:1em"><p class="klein">Die Präsentationstermine werden gelost. <strong>Alle</strong> Gruppen müssen also am 27.11. präsentationsbereit sein.</p></div>
+</section>
+
+<!-- 5 Präsentationsformen -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Zwei Präsentationsformen: Ihr wählt</h2>
+  <div class="zwei">
+    <div class="box">
+      <h3>Selbst gestaltete Unterrichtsstunde</h3>
+      <p class="klein"><strong>max. 40 Minuten</strong></p>
+      <ul class="klein" style="margin-top:.5em">
+        <li>Ihr unterrichtet den Kurs.</li>
+        <li>Der Kurs arbeitet selbst mit Material und Aufträgen.</li>
+        <li>Endprodukt: <strong>Arbeitsblätter mit Präsentation</strong></li>
+      </ul>
+    </div>
+    <div class="box petrol">
+      <h3>Ausführliches Referat</h3>
+      <p class="klein"><strong>20–30 Minuten</strong></p>
+      <ul class="klein" style="margin-top:.5em">
+        <li>Strukturierter Vortrag mit anschließender Diskussion.</li>
+        <li>Bindet den Kurs ein, z. B. mit Abfragen oder Diskussionsimpulsen.</li>
+        <li>Endprodukt: <strong>digitale Präsentation mit Handout</strong></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6 Ausgangsmaterial -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Arbeitet mit dem Ausgangsmaterial</h2>
+  <ul>
+    <li>Jedes Gruppenmitglied liest die Materialen vollständig.</li>
+    <li>Die zentralen Informationen, Positionen und Argumente müssen in eurem Projekt wiedererkennbar sein.</li>
+    <li>Die Aufgaben im Material sind eine <strong>Hilfe, kein Pflichtprogramm</strong>. Bearbeitet die Aufgaben, die euch beim Verständnis und beim Vergleich helfen.</li>
+  </ul>
+  <div class="box" style="margin-top:.8em">
+    <p class="klein">Macht Euch beim Lesen immer Notizen zu drei Aspekten; notiert ...<br><br></p>
+    <ol class="klein">
+      <li>die zentralen <strong>Informationen</strong> des Materials</li>
+      <li>wichtige <strong>Fachbegriffe</strong> mit Erklärung</li>
+      <li><strong>offene Fragen</strong></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 7 Recherche und Quellen -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Recherche und Quellen</h2>
+  <div class="zwei">
+    <div>
+      <h3>Wenn ihr weiter recherchiert, prüft:</h3>
+      <ul class="klein">
+        <li>Wer ist <strong>Autor</strong> oder <strong>Herausgeber</strong>?</li>
+        <li>Wie <strong>aktuell</strong> ist die Quelle?</li>
+        <li>Welche <strong>Interessen</strong> könnten dahinterstehen?</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Belegen</h3>
+      <ul class="klein">
+        <li>Jede Information, die nicht von euch stammt, wird belegt.</li>
+        <li>Auf Folien oder Handout: <strong>Kurzbeleg</strong></li>
+        <li>Am Ende: vollständiges <strong>Quellenverzeichnis</strong></li>
+        <li>Internetquellen: Titel, Herausgeber, URL, Abrufdatum</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8 KI -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>KI-Nutzung: erlaubt, aber transparent</h2>
+  <div class="zwei">
+    <div>
+      <ul class="klein">
+        <li>KI ist als <strong>zusätzliches Hilfsmittel</strong> erlaubt, wenn ihr sie offenlegt.</li>
+        <li><strong>KI-Protokoll:</strong> Welches Tool habt ihr wofür genutzt (Prompt in Stichworten)? Dazu ein <strong>Screenshot</strong>.</li>
+        <li>„KI-Antworten“ sind <strong>keine Quelle</strong>. Jede Sachinformation aus einer KI prüft ihr mit dem Beitrag oder einer seriösen Quelle, die ihr dann zitiert.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Achtung</h3>
+      <p class="klein">Gegen die Regeln der Leistungsbewertung verstößt, wer KI nutzt, ohne sie anzugeben, oder wer das Thema nicht eigenständig beherrscht. Das zeigt sich z. B., wenn plausible Nachfragen nicht angemessen beantwortet werden können.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 Zusammenarbeit und Produkte -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Zusammenarbeit und Produkte</h2>
+  <div class="box" style="margin-bottom:1em">
+    <p class="klein">Ihr könnt <strong>arbeitsteilig</strong> vorgehen, aber <strong>alle</strong> Gruppenmitglieder sind für <strong>alle</strong> Themen und Unteraspekte kompetent. Wird ein Mitglied krank, darf das die Präsentation weder schwächen noch verhindern. Alle sollen Nachfragen beantworten können.</p>
+  </div>
+  <div class="zwei" style="flex:none">
+    <div>
+      <h3>Zwischenprodukte (20.11.)</h3>
+      <ul class="klein"><li>inhaltliche Gliederung</li><li>Verlaufsplan</li><li>Notizen</li><li>angefangene Präsentation …</li></ul>
+    </div>
+    <div>
+      <h3>Endprodukte (26.11.)</h3>
+      <ul class="klein"><li>Referat: digitale Präsentation mit Handout</li><li>Unterrichtsstunde: Arbeitsblätter mit Präsentation</li><li>Quellenverzeichnis, ggf. KI-Protokoll</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- 10 Inhaltliche Anforderungen -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Inhaltlich: ein echter Vergleich</h2>
+  <p>Anforderungen auf dem Aufgabenblatt bitte gründlich lesen. Sie helfen bei der Strukturiereung!</p>
+</section>
+
+<!-- 11 Leitfrage und Urteil -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Leitfrage und begründetes Urteil</h2>
+  <div class="zitat">„Sollte Deutschland … nach dem Vorbild von … einführen?“</div>
+  <ul style="margin-top:1em">
+    <li>Formuliert eine <strong>Leitfrage</strong>, die zu eurem Thema passt.</li>
+    <li>Beantwortet sie mit einem <strong>begründeten Urteil</strong>.</li>
+    <li>„Finde ich gut“ oder „finde ich schlecht“ reicht nicht. Ein Urteil braucht einen <strong>Maßstab</strong>: die <strong>Urteilskriterien</strong>.</li>
+    <li>Kommt zu einem klaren Ergebnis: Was kann Deutschland <strong>übernehmen</strong>, was <strong>in veränderter Form</strong>, was <strong>nicht</strong>? Mit welchen Risiken?</li>
+    <li>Unterschiedliche Meinungen innerhalb der Gruppe dürft ihr offen darstellen.</li>
+  </ul>
+</section>
+
+<!-- 12 Kriterien -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2 style="margin-bottom:.3em">Urteilskriterien: Wählt mindestens zwei</h2>
+  <table>
+    <tr><th>Kriterium</th><th>Was bedeutet das?</th><th>Leitfragen für euer Thema</th></tr>
+    <tr><td>Effizienz / Wirtschaftlichkeit</td><td>Wird das Ziel mit vertretbarem Aufwand erreicht?</td><td>Was kostet die Maßnahme, und was bringt sie? Erreicht sie ihr Ziel wirklich? Gibt es günstigere Wege?</td></tr>
+    <tr><td>Gerechtigkeit</td><td>Werden Menschen fair behandelt?</td><td>Wer profitiert, wer trägt die Nachteile? Werden bestimmte Gruppen benachteiligt? Ist die Verteilung fair zwischen den Generationen?</td></tr>
+    <tr><td>Legitimität</td><td>Ist die Maßnahme rechtlich und demokratisch in Ordnung?</td><td>Passt sie zum Grundgesetz? Ist sie demokratisch zustande gekommen? Darf der Staat das verlangen oder regeln?</td></tr>
+    <tr><td>Umsetzbarkeit</td><td>Lässt sich das in Deutschland praktisch einführen?</td><td>Gibt es die nötigen Gesetze, Geld, Personal oder Technik? Wer müsste zustimmen? Wie lange würde es dauern?</td></tr>
+    <tr><td>Nachhaltigkeit</td><td>Wirkt die Maßnahme auch langfristig?</td><td>Löst sie das Problem dauerhaft? Welche Folgen hat sie in 20 oder 30 Jahren? Belastet sie künftige Generationen?</td></tr>
+    <tr><td>Freiheit</td><td>Wie stark werden Menschen eingeschränkt?</td><td>Werden Menschen zu etwas verpflichtet? Wird ihre Wahlfreiheit größer oder kleiner? Ist ein Eingriff gerechtfertigt?</td></tr>
+    <tr><td>Akzeptanz</td><td>Würden die Menschen die Maßnahme mittragen?</td><td>Wie reagieren Bürger:innen, Parteien, Verbände? Gibt es Widerstand? Passt das Modell zur politischen Kultur?</td></tr>
+  </table>
+</section>
+
+<!-- 13 Beispiel -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Beispiel: Tempolimit auf Autobahnen</h2>
+  <div class="zwei">
+    <div class="zitat" style="font-size:.8em">„Unter dem Kriterium der <strong>Nachhaltigkeit</strong> spricht viel für ein Tempolimit, weil weniger CO₂ ausgestoßen wird. Unter dem Kriterium der <strong>Freiheit</strong> wird jedoch kritisiert, dass Autofahrer:innen eingeschränkt werden. Hier zeigt sich ein <strong>Zielkonflikt</strong> zwischen Klimaschutz und individueller Freiheit. Wir halten den Klimaschutz für <strong>wichtiger</strong>, weil die Einschränkung gering ist, die Folgen des Klimawandels aber alle betreffen.“</div>
+    <div><img style="max-height:20em" class="placeholder" src="2.png" alt="Limit"></div>
+
+  </div>
+  <p class="sehrklein grau" style="margin-top:.8em">Das Beispiel zeigt nur den verkürzten Aufbau eines Urteils. Die Begründung ist natürlich entscheidend, um die Gewichtung der Kriterien zu verstehen.</p>
+</section>
+
+<!-- 14 Nächste Schritte -->
+<section class="slide">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h2>Die nächsten Schritte</h2>
+  <ol>
+    <li>Gruppe bilden (ca. 4) und <strong>Themen</strong> zuteilen</li>
+    <li><strong>Präsentationsform</strong> wählen: Unterrichtsstunde oder Referat</li>
+    <li>Beitrag lesen, um ...</li>
+    <li>erste Aufgaben zu verteilen</li>
+    <li>Zwischenstand bis <strong>20.11.</strong> ins LMS, Gesamtpaket bis <strong>26.11.</strong></li>
+  </ol>
+</section>
+
+<!-- 15 Fragen -->
+<section class="slide titelfolie">
+  <div class="kopf">SW ZK3 · Politik im internationalen Vergleich</div>
+  <h1 style="text-align:center">Fragen?</h1>
+  <p class="grau" style="text-align:center">Viel Erfolg bei der Arbeit!</p>
+</section>
+
+</div>
+
+<div class="nav">
+  <button id="zurueck" aria-label="Zurück">&#9664;</button>
+  <span id="zaehler">1 / 1</span>
+  <button id="weiter" aria-label="Weiter">&#9654;</button>
+</div>
+
+<script>
+  const folien = document.querySelectorAll('.slide');
+  let aktuell = 0;
+  function zeige(n){
+    folien[aktuell].classList.remove('active');
+    aktuell = Math.max(0, Math.min(folien.length - 1, n));
+    folien[aktuell].classList.add('active');
+    document.getElementById('zaehler').textContent = (aktuell + 1) + ' / ' + folien.length;
+    document.getElementById('fortschritt').style.width = ((aktuell + 1) / folien.length * 100) + '%';
+  }
+  document.getElementById('weiter').onclick = () => zeige(aktuell + 1);
+  document.getElementById('zurueck').onclick = () => zeige(aktuell - 1);
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); zeige(aktuell + 1); }
+    if (['ArrowLeft','PageUp'].includes(e.key)) zeige(aktuell - 1);
+    if (e.key === 'Home') zeige(0);
+    if (e.key === 'End') zeige(folien.length - 1);
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+  zeige(0);
+</script>
+</body>
+</html>
