@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Die EU – gut konstruiert oder zu kompliziert?</title>
+<style>
+  :root {
+    --blau: #003399;
+    --gelb: #FFCC00;
+    --text: #1f2937;
+    --grau: #6b7280;
+    --hell: #f4f6fb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #2b2f3a;
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .buehne {
+    width: min(96vw, calc(92vh * 4 / 3));
+    aspect-ratio: 4 / 3;
+    position: relative;
+    font-size: min(2.4vw, 3.2vh);
+  }
+  .folie {
+    position: absolute; inset: 0;
+    background: #fff;
+    border-radius: 0.6em;
+    box-shadow: 0 1em 3em rgba(0,0,0,.35);
+    padding: 3em 3.5em 3.5em;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transition: opacity .4s ease;
+    overflow: hidden;
+  }
+  .folie.aktiv { opacity: 1; pointer-events: auto; }
+  .folie::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+    width: .5em; background: var(--blau);
+  }
+  .folie::after {
+    content: ""; position: absolute; left: 0; top: 0;
+    width: .5em; height: 4em; background: var(--gelb);
+  }
+  h1 { font-size: 2.3em; color: var(--blau); line-height: 1.2; }
+  h2 { font-size: 1.6em; color: var(--blau); margin-bottom: 1em; }
+  p  { font-size: 1em; line-height: 1.6; margin-bottom: .8em; }
+  .klein { color: var(--grau); font-size: .85em; }
+
+  /* Titelfolie */
+  .titel {
+    background: var(--blau); color: #fff;
+    justify-content: center; text-align: center;
+  }
+  .titel::before, .titel::after { display: none; }
+  .titel h1 { color: #fff; font-size: 2.4em; }
+  .titel .unter { margin-top: 1.2em; color: var(--gelb); font-size: 1.1em; letter-spacing: .05em; }
+  .sterne { position: absolute; inset: 0; pointer-events: none; }
+  .sterne span {
+    position: absolute; color: var(--gelb); font-size: 1.4em;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Schritte */
+  .schritte { display: flex; flex-direction: column; gap: 1em; margin-top: .5em; }
+  .schritt { display: flex; align-items: center; gap: 1em;
+             background: var(--hell); padding: .9em 1.2em; border-radius: .5em; }
+  .nr { flex: 0 0 2.2em; height: 2.2em; border-radius: 50%;
+        background: var(--blau); color: #fff; font-weight: bold;
+        display: flex; align-items: center; justify-content: center; }
+
+  /* Tabelle */
+  table { width: 100%; border-collapse: collapse; font-size: .95em; }
+  th { text-align: left; color: var(--blau); border-bottom: .15em solid var(--gelb); padding: .6em .5em; }
+  td { padding: .75em .5em; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  .tag { display: inline-block; background: var(--hell); color: var(--blau);
+         padding: .1em .5em; border-radius: .3em; font-size: .9em; white-space: nowrap; }
+
+  .hinweis { margin-top: 1em; background: #fff8db; border-left: .3em solid var(--gelb);
+             padding: 1em 1.2em; border-radius: .3em; line-height: 1.6; }
+
+  /* Navigation */
+  .nav { position: absolute; bottom: 1.1em; right: 1.5em; display: flex; gap: .5em; align-items: center; z-index: 5; }
+  .nav button { border: none; background: var(--hell); color: var(--blau);
+                width: 2em; height: 2em; border-radius: 50%; font-size: .9em; cursor: pointer; }
+  .nav button:hover { background: var(--gelb); }
+  .zaehler { font-size: .75em; color: var(--grau); min-width: 3em; text-align: center; }
+  .titel-aktiv .nav button { background: rgba(255,255,255,.15); color: #fff; }
+  .titel-aktiv .zaehler { color: #cfd8f0; }
+</style>
+</head>
+<body>
+<div class="buehne" id="buehne">
+
+  <!-- 1 Titel -->
+  <section class="folie titel aktiv">
+    <div class="sterne" id="sterne"></div>
+    <p class="klein" style="color:#cfd8f0">Leitfrage unserer Reihe</p>
+    <h1>Die EU – gut konstruiert<br>oder zu kompliziert?</h1>
+    <p class="unter">Unsere nächsten Stunden</p>
+  </section>
+
+  <!-- 2 Fahrplan -->
+  <section class="folie">
+    <h2>Euer Weg durch die Reihe</h2>
+    <div class="schritte">
+      <div class="schritt"><div class="nr">1</div><div><strong>EU-Recht &amp; nationales Recht</strong><br><span class="klein">Wie hängen beide zusammen?</span></div></div>
+      <div class="schritt"><div class="nr">2</div><div><strong>Die EU-Institutionen</strong><br><span class="klein">Die wichtigsten Organe kennenlernen</span></div></div>
+      <div class="schritt"><div class="nr">3</div><div><strong>Wie demokratisch ist die EU?</strong><br><span class="klein">Prüfung anhand von Repräsentation und Legitimation</span></div></div>
+    </div>
+  </section>
+
+  <!-- 3 Zeitplan -->
+  <section class="folie">
+    <h2>Zeitplan</h2>
+    <table>
+      <tr><th>Datum</th><th>Thema</th><th>Material</th></tr>
+      <tr><td>Di, 10.11.</td><td>EU-Recht vs. nationales Recht; Institutionen I</td><td><span class="tag">M1–M3b</span></td></tr>
+      <tr><td>Mi, 11.11.</td><td>Institutionen II</td><td><span class="tag">M3c–M3d</span></td></tr>
+      <tr><td>Mi, 18.11.</td><td>Institutionen III, Kriterien für Demokratie</td><td><span class="tag">M4-M5</span></td></tr>
+      <tr><td>Di, 24.11.</td><td>Demokratiedefizit und Reformpositionen; Analyse</td><td><span class="tag">M5</span></td></tr>
+      <tr><td>Mi, 25.11.</td><td>Wiederholung</td><td></td></tr>
+    </table>
+  </section>
+
+  <!-- 4 Landkarte -->
+  <section class="folie">
+    <h2>Eure Landkarte</h2>
+    <p>Die Übersicht <strong>„EU-Institutionen und ihr Zusammenspiel“ (S. 5)</strong> begleitet euch durch die ganze Reihe.</p>
+    <div class="hinweis">
+      Sie wirkt auf den ersten Blick sehr voll. Lasst euch davon nicht abschrecken: Wenn ihr die Institutionen erarbeitet habt, werdet ihr sie verstehen 🙂
+    </div>
+    <p style="margin-top:1.5em">Viele Grüße, HW und GOC</p>
+  </section>
+
+  <div class="nav">
+    <button onclick="gehe(-1)" aria-label="zurück">&#8592;</button>
+    <span class="zaehler" id="zaehler"></span>
+    <button onclick="gehe(1)" aria-label="weiter">&#8594;</button>
+  </div>
+</div>
+
+<script>
+  const folien = document.querySelectorAll('.folie');
+  const buehne = document.getElementById('buehne');
+  let i = 0;
+  function zeige() {
+    folien.forEach((f, n) => f.classList.toggle('aktiv', n === i));
+    document.getElementById('zaehler').textContent = (i + 1) + ' / ' + folien.length;
+    buehne.classList.toggle('titel-aktiv', i === 0);
+  }
+  function gehe(d) { i = Math.max(0, Math.min(folien.length - 1, i + d)); zeige(); }
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) gehe(1);
+    if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) gehe(-1);
+  });
+  const s = document.getElementById('sterne');
+  for (let k = 0; k < 12; k++) {
+    const w = k * Math.PI / 6;
+    const el = document.createElement('span');
+    el.textContent = '★';
+    el.style.left = (50 + 40 * Math.cos(w) * 0.75) + '%';
+    el.style.top  = (50 + 40 * Math.sin(w)) + '%';
+    el.style.opacity = .25;
+    s.appendChild(el);
+  }
+  zeige();
+</script>
+</body>
+</html>
